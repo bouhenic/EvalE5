@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Évaluation - BTS CIEL E5</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-nav">
+        <a href="/" class="btn btn-secondary">← Retour à la liste</a>
+        <div class="header-info">
+          <h1>📝 Évaluation</h1>
+          <p id="eleve-info" class="eleve-info">Chargement...</p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div id="loading" class="loading">Chargement...</div>
+      <div id="error" class="error" style="display: none;"></div>
+
+      <div id="evaluation-container" style="display: none;">
+        <!-- Sélecteur de semestre -->
+        <div class="semestre-selector">
+          <label for="select-semestre">Choisir un semestre :</label>
+          <select id="select-semestre" onchange="changerSemestre()">
+            <option value="">-- Sélectionner --</option>
+            <option value="semestre_1">Semestre 1</option>
+            <option value="semestre_2">Semestre 2</option>
+            <option value="semestre_3">Semestre 3</option>
+            <option value="semestre_4">Semestre 4</option>
+          </select>
+        </div>
+
+        <!-- Formulaire d'évaluation -->
+        <div id="form-evaluation" style="display: none;">
+          <div class="evaluation-header">
+            <h2 id="titre-semestre">Semestre 1</h2>
+            <div class="evaluation-info">
+              <span id="date-evaluation" class="date-info"></span>
+            </div>
+          </div>
+
+          <!-- Affichage des notes -->
+          <div id="notes-container" class="notes-container" style="display: none;">
+            <h3>📊 Notes calculées</h3>
+            <div class="notes-grid">
+              <div class="note-card">
+                <div class="note-label">Semestre actuel</div>
+                <div class="note-value" id="note-semestre">--</div>
+              </div>
+              <div class="note-card moyenne-generale">
+                <div class="note-label">Moyenne générale</div>
+                <div class="note-value" id="note-moyenne">--</div>
+              </div>
+            </div>
+            <div id="notes-detail" class="notes-detail"></div>
+          </div>
+
+          <!-- Compétences -->
+          <div id="competences-container">
+            <!-- Rempli dynamiquement -->
+          </div>
+
+          <!-- Commentaire global -->
+          <div class="commentaire-section">
+            <label for="commentaire-global">Commentaire global (obligatoire si note < 10/20) :</label>
+            <textarea id="commentaire-global" rows="4" placeholder="Saisir un commentaire..."></textarea>
+          </div>
+
+          <!-- Actions -->
+          <div class="actions-bottom">
+            <button class="btn btn-warning" onclick="sauvegarderBrouillon()">
+              💾 Enregistrer brouillon
+            </button>
+            <button class="btn btn-success" onclick="finaliser()">
+              ✅ Finaliser et remplir Excel
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>Application d'évaluation - Session 2024</p>
+    </footer>
+  </div>
+
+  <script src="/js/evaluation.js"></script>
+</body>
+</html>

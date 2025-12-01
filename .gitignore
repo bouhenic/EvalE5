@@ -1,0 +1,28 @@
+# Node modules
+node_modules/
+
+# Fichiers Excel générés
+backend/export/*.xlsx
+
+# Logs
+*.log
+npm-debug.log*
+
+# Fichiers temporaires
+.DS_Store
+*.tmp
+~$*.xlsx
+
+# Environnement
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build
+dist/
+build/

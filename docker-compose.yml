@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  eval-e5:
+    build: .
+    container_name: eval-e5-app
+    ports:
+      - "3000:3000"
+    volumes:
+      # Monte le dossier export de l'hôte dans le conteneur
+      - ./backend/export:/app/backend/export
+      # Monte le dossier modeles (lecture seule)
+      - ./modeles:/app/modeles:ro
+      # Monte les données des élèves et évaluations
+      - ./backend/data:/app/backend/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+    networks:
+      - eval-network
+
+networks:
+  eval-network:
+    driver: bridge

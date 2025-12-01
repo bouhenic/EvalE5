@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "nom": "AMROUNI",
+    "prenom": "Aghiles",
+    "promotion": "2024-2026",
+    "numero_candidat": "2024001",
+    "academie": "Académie de Versailles",
+    "etablissement": "Lycée Isaac Newton",
+    "session": "SESSION 2026"
+  },
+  {
+    "id": 2,
+    "nom": "ABAID",
+    "prenom": "Soulaimane",
+    "promotion": "2025-2027",
+    "numero_candidat": "2025001",
+    "academie": "Académie de Versailles",
+    "etablissement": "Lycée Isaac Newton",
+    "session": "SESSION 2027"
+  },
+  {
+    "id": 3,
+    "nom": "AISSOU",
+    "prenom": "Abdel",
+    "promotion": "2025-2027",
+    "numero_candidat": "2025002",
+    "academie": "Académie de Versailles",
+    "etablissement": "Lycée Isaac Newton",
+    "session": "SESSION 2027"
+  },
+  {
+    "id": 4,
+    "nom": "AQADDAR",
+    "prenom": "Walid",
+    "promotion": "2024-2026",
+    "numero_candidat": "2024002",
+    "academie": "Académie de Versailles",
+    "etablissement": "Lycée Isaac Newton",
+    "session": "SESSION 2026"
+  },
+  {
+    "id": 5,
+    "nom": "ASSABIRI",
+    "prenom": "Nassim",
+    "promotion": "2024-2026",
+    "numero_candidat": "2024003",
+    "academie": "Académie de Versailles",
+    "etablissement": "Lycée Isaac Newton",
+    "session": "SESSION 2026"
+  }
+]

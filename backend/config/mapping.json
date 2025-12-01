@@ -1,0 +1,247 @@
+{
+  "sheetNames": {
+    "semestre_1": "E5-FICHE SEMESTRE1 E5-IR",
+    "semestre_2": "E5-FICHE SEMESTRE2 E5-IR",
+    "semestre_3": "E5-FICHE SEMESTRE3 E5-IR",
+    "semestre_4": "E5-FICHE SEMESTRE4 E5-IR",
+    "recapitulatif": "E5-FICHE RECAPITULATIVE E5-IR",
+    "jury": "FICHE RENDU JURY E5 - ER"
+  },
+
+  "identite": {
+    "academie": {
+      "semestre_1": "E7",
+      "semestre_2": "E7",
+      "semestre_3": "E7",
+      "semestre_4": "E7",
+      "recapitulatif": "E7",
+      "jury": "C20"
+    },
+    "etablissement": {
+      "semestre_1": "E8",
+      "semestre_2": "E8",
+      "semestre_3": "E8",
+      "semestre_4": "E8",
+      "recapitulatif": "E8",
+      "jury": "C21"
+    },
+    "nom": {
+      "semestre_1": "E9",
+      "semestre_2": "E9",
+      "semestre_3": "E9",
+      "semestre_4": "E9",
+      "recapitulatif": "E9",
+      "jury": "C22"
+    },
+    "prenom": {
+      "semestre_1": "E10",
+      "semestre_2": "E10",
+      "semestre_3": "E10",
+      "semestre_4": "E10",
+      "recapitulatif": "E10",
+      "jury": "C23"
+    },
+    "numero_candidat": {
+      "semestre_1": "E11",
+      "semestre_2": "E11",
+      "semestre_3": "E11",
+      "semestre_4": "E11",
+      "recapitulatif": "E11",
+      "jury": "C24"
+    },
+    "session": {
+      "semestre_1": "A5",
+      "semestre_2": "A5",
+      "semestre_3": "A5",
+      "semestre_4": "A5",
+      "recapitulatif": "A5",
+      "jury": "B18"
+    }
+  },
+
+  "competences": {
+    "C02": {
+      "nom": "ORGANISER UNE INTERVENTION",
+      "coefficient": 0.2,
+      "criteres": [
+        {
+          "id": "c02_c1",
+          "nom": "Les différents interlocuteurs et ressources sont identifiés",
+          "coefficient": 0.25,
+          "ligne": 20
+        },
+        {
+          "id": "c02_c2",
+          "nom": "Le cahier des charges préliminaire est complété et les ressources permettant de répondre au cahier des charges sont décrites",
+          "coefficient": 0.25,
+          "ligne": 21
+        },
+        {
+          "id": "c02_c3",
+          "nom": "Le planning prévisionnel est interprété",
+          "coefficient": 0.2,
+          "ligne": 22
+        },
+        {
+          "id": "c02_c4",
+          "nom": "Compétences transversales (prise de décision, adaptation, qualité, efficacité)",
+          "coefficient": 0.3,
+          "ligne": 24
+        }
+      ]
+    },
+    "C06": {
+      "nom": "VALIDER UN SYSTÈME INFORMATIQUE",
+      "coefficient": 0.2,
+      "criteres": [
+        {
+          "id": "c06_c1",
+          "nom": "Les exigences à valider sont identifiées dans le périmètre défini",
+          "coefficient": 0.2,
+          "ligne": 31
+        },
+        {
+          "id": "c06_c2",
+          "nom": "Les procédures de test sont établies",
+          "coefficient": 0.2,
+          "ligne": 32
+        },
+        {
+          "id": "c06_c3",
+          "nom": "Les tests (unitaires, d'intégration et autres) sont appliqués",
+          "coefficient": 0.1,
+          "ligne": 33
+        },
+        {
+          "id": "c06_c4",
+          "nom": "Les résultats de tests sont synthétisés pour évaluer la conformité globale",
+          "coefficient": 0.1,
+          "ligne": 34
+        },
+        {
+          "id": "c06_c5",
+          "nom": "Le document de recette est validé par le client et la recette est réalisée avec le client",
+          "coefficient": 0.1,
+          "ligne": 35
+        },
+        {
+          "id": "c06_c6",
+          "nom": "Compétences transversales (qualité, persévérance, prise de décision)",
+          "coefficient": 0.3,
+          "ligne": 37
+        }
+      ]
+    },
+    "C09": {
+      "nom": "INSTALLER UN RÉSEAU INFORMATIQUE",
+      "coefficient": 0.3,
+      "criteres": [
+        {
+          "id": "c09_c1",
+          "nom": "Les équipements nécessaires à la réponse au CDC (fourni par le client) sont identifiés",
+          "coefficient": 0.2,
+          "ligne": 44
+        },
+        {
+          "id": "c09_c2",
+          "nom": "Une procédure de configuration ou d'installation est déterminée ainsi que les points critiques",
+          "coefficient": 0.2,
+          "ligne": 45
+        },
+        {
+          "id": "c09_c3",
+          "nom": "La ou les procédures choisies sont suivies",
+          "coefficient": 0.1,
+          "ligne": 46
+        },
+        {
+          "id": "c09_c4",
+          "nom": "Les activités sont menées en respectant les règles de sécurité",
+          "coefficient": 0.1,
+          "ligne": 47
+        },
+        {
+          "id": "c09_c5",
+          "nom": "Un compte-rendu du fonctionnement de l'installation est fourni",
+          "coefficient": 0.1,
+          "ligne": 48
+        },
+        {
+          "id": "c09_c6",
+          "nom": "Compétences transversales (communication, qualité, efficacité)",
+          "coefficient": 0.3,
+          "ligne": 50
+        }
+      ]
+    },
+    "C11": {
+      "nom": "MAINTENIR UN RÉSEAU INFORMATIQUE",
+      "coefficient": 0.3,
+      "criteres": [
+        {
+          "id": "c11_c1",
+          "nom": "Les outils logiciels et matériels permettant d'effectuer les tests et l'analyse du SI sont identifiés et mis en œuvre",
+          "coefficient": 0.2,
+          "ligne": 57
+        },
+        {
+          "id": "c11_c2",
+          "nom": "Les résultats de tests et d'analyse sont interprétés de manière pertinente et les causes de l'incident sont localisées",
+          "coefficient": 0.2,
+          "ligne": 58
+        },
+        {
+          "id": "c11_c3",
+          "nom": "L'incident est résolu ou qualifié et escaladé, le service est opérationnel",
+          "coefficient": 0.2,
+          "ligne": 59
+        },
+        {
+          "id": "c11_c4",
+          "nom": "Le client est correctement informé et conseillé quant aux mesures de prévention possibles",
+          "coefficient": 0.1,
+          "ligne": 60
+        },
+        {
+          "id": "c11_c5",
+          "nom": "Compétences transversales (analyse, résolution, communication)",
+          "coefficient": 0.3,
+          "ligne": 62
+        }
+      ]
+    }
+  },
+
+  "niveaux": {
+    "niveau_1": {
+      "colonne": "C",
+      "valeur": 0,
+      "label": "Non réalisé"
+    },
+    "niveau_2": {
+      "colonne": "D",
+      "valeur": 1,
+      "label": "Réalisation partielle"
+    },
+    "niveau_3": {
+      "colonne": "E",
+      "valeur": 2,
+      "label": "Réalisation satisfaisante"
+    },
+    "niveau_4": {
+      "colonne": "F",
+      "valeur": 3,
+      "label": "Réalisation très satisfaisante"
+    }
+  },
+
+  "commentaires": {
+    "commentaire_global": {
+      "semestre_1": "A7",
+      "semestre_2": "A7",
+      "semestre_3": "A7",
+      "semestre_4": "A7",
+      "recapitulatif": "A7"
+    }
+  }
+}

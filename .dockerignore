@@ -1,0 +1,26 @@
+# Dépendances
+node_modules
+npm-debug.log
+
+# Fichiers de développement
+.git
+.gitignore
+.DS_Store
+
+# Documentation
+*.md
+!README.md
+
+# Fichiers de test
+test-*.js
+
+# Fichiers temporaires
+*.tmp
+*.log
+
+# Exports locaux (seront montés depuis l'hôte)
+backend/export/*
+backend/data/*
+
+# Configuration locale
+.env.local

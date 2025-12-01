@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Évaluation BTS CIEL - Épreuve E5</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎓 Évaluation BTS CIEL</h1>
+      <h2>Épreuve E5 : Exploitation et maintenance de réseaux informatiques</h2>
+    </header>
+
+    <main>
+      <div class="toolbar">
+        <div>
+          <button class="btn btn-success" onclick="ouvrirModalAjout()">➕ Ajouter un élève</button>
+          <button class="btn btn-secondary" onclick="refreshEleves()">🔄 Actualiser</button>
+        </div>
+        <div class="filters">
+          <label for="filtre-promotion">Promotion :</label>
+          <select id="filtre-promotion" onchange="filtrerParPromotion()">
+            <option value="">Toutes les promotions</option>
+          </select>
+        </div>
+        <div class="info">
+          <span id="count-eleves">0 élève(s)</span>
+        </div>
+      </div>
+
+      <div id="loading" class="loading">Chargement des élèves...</div>
+      <div id="error" class="error" style="display: none;"></div>
+
+      <table id="table-eleves" class="table-eleves" style="display: none;">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Promotion</th>
+            <th>Moyenne</th>
+            <th>N° Candidat</th>
+            <th>Statut Excel</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-eleves">
+          <!-- Rempli dynamiquement -->
+        </tbody>
+      </table>
+    </main>
+
+    <footer>
+      <p>Application d'évaluation - Session 2024</p>
+    </footer>
+  </div>
+
+  <!-- Modal pour ajouter un élève -->
+  <div id="modal-ajout-eleve" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Ajouter un élève</h2>
+        <button class="btn-close" onclick="fermerModalAjout()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-ajout-eleve" onsubmit="ajouterEleve(event)">
+          <div class="form-group">
+            <label for="nom">Nom *</label>
+            <input type="text" id="nom" name="nom" required>
+          </div>
+          <div class="form-group">
+            <label for="prenom">Prénom *</label>
+            <input type="text" id="prenom" name="prenom" required>
+          </div>
+          <div class="form-group">
+            <label for="promotion">Promotion *</label>
+            <input type="text" id="promotion" name="promotion" value="2024-2026" required>
+          </div>
+          <div class="form-group">
+            <label for="numero_candidat">Numéro candidat *</label>
+            <input type="text" id="numero_candidat" name="numero_candidat" required>
+          </div>
+          <div class="form-group">
+            <label for="academie">Académie *</label>
+            <input type="text" id="academie" name="academie" value="Académie de Versailles" required>
+          </div>
+          <div class="form-group">
+            <label for="etablissement">Établissement *</label>
+            <input type="text" id="etablissement" name="etablissement" value="Lycée Isaac Newton" required>
+          </div>
+          <div class="form-group">
+            <label for="session">Session *</label>
+            <input type="text" id="session" name="session" value="SESSION 2026" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="fermerModalAjout()">Annuler</button>
+            <button type="submit" class="btn btn-success">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/index.js"></script>
+</body>
+</html>

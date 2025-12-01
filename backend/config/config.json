@@ -1,0 +1,21 @@
+{
+  "port": 3000,
+  "paths": {
+    "modeles": "./modeles",
+    "export": "./backend/export",
+    "data": "./backend/data",
+    "config": "./backend/config"
+  },
+  "fichiers": {
+    "modele_excel": "modele_officiel.xlsx",
+    "eleves": "eleves.json",
+    "evaluations": "evaluations.json",
+    "mapping": "mapping.json"
+  },
+  "semestres": [
+    { "id": "semestre_1", "label": "Semestre 1" },
+    { "id": "semestre_2", "label": "Semestre 2" },
+    { "id": "semestre_3", "label": "Semestre 3" },
+    { "id": "semestre_4", "label": "Semestre 4" }
+  ]
+}

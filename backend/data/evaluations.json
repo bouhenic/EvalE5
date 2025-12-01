@@ -1,0 +1,95 @@
+{
+  "5": {
+    "id": 5,
+    "nom": "ASSABIRI",
+    "prenom": "Nassim",
+    "promotion": "2024-2026",
+    "evaluations": {
+      "semestre_1": {
+        "date_evaluation": "2025-11-30T17:33:45.854Z",
+        "commentaire": "",
+        "competences": {
+          "C02": {
+            "criteres": {
+              "c02_c1": {
+                "niveau": 0
+              },
+              "c02_c2": {
+                "niveau": 1
+              },
+              "c02_c3": {
+                "niveau": 1
+              },
+              "c02_c4": {
+                "niveau": 0
+              }
+            }
+          },
+          "C06": {
+            "criteres": {
+              "c06_c1": {
+                "niveau": 1
+              },
+              "c06_c2": {
+                "niveau": 1
+              },
+              "c06_c3": {
+                "niveau": 1
+              },
+              "c06_c4": {
+                "niveau": 1
+              },
+              "c06_c5": {
+                "niveau": 2
+              },
+              "c06_c6": {
+                "niveau": 2
+              }
+            }
+          },
+          "C09": {
+            "criteres": {
+              "c09_c1": {
+                "niveau": 2
+              },
+              "c09_c2": {
+                "niveau": 1
+              },
+              "c09_c3": {
+                "niveau": 1
+              },
+              "c09_c4": {
+                "niveau": 1
+              },
+              "c09_c5": {
+                "niveau": 2
+              },
+              "c09_c6": {
+                "niveau": 2
+              }
+            }
+          },
+          "C11": {
+            "criteres": {
+              "c11_c1": {
+                "niveau": 2
+              },
+              "c11_c2": {
+                "niveau": 1
+              },
+              "c11_c3": {
+                "niveau": 2
+              },
+              "c11_c4": {
+                "niveau": 2
+              },
+              "c11_c5": {
+                "niveau": 2
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
