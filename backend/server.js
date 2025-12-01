@@ -41,10 +41,7 @@ try {
 }
 
 // Middleware
-app.use(cors({
-  origin: true, // Permet l'origine de la requête (nécessaire pour les cookies)
-  credentials: true // Permet l'envoi de cookies
-}));
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -56,8 +53,7 @@ app.use(session({
   cookie: {
     secure: false, // Désactivé pour permettre HTTP et HTTPS
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 heures
-    sameSite: 'lax' // Protection CSRF tout en permettant la navigation normale
+    maxAge: 24 * 60 * 60 * 1000 // 24 heures
   }
 }));
 
