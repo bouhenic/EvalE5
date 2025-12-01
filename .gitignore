@@ -1,8 +1,9 @@
 # Node modules
 node_modules/
 
-# Fichiers Excel générés
-backend/export/*.xlsx
+# Fichiers Excel générés - CONFIDENTIELS
+backend/export/
+backend/export/**/*.xlsx
 
 # Logs
 *.log
