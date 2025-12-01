@@ -24,10 +24,16 @@ docker-compose up -d
 
 ### 3. Accéder à l'application
 
-**HTTPS (recommandé)** : https://localhost:3443
-**HTTP** : http://localhost:3000
+Selon si vous avez exécuté le script d'initialisation :
 
-⚠️ **Avertissement de sécurité** : Les certificats SSL sont auto-signés, votre navigateur affichera un avertissement. C'est normal, vous pouvez l'accepter pour continuer.
+**Avec certificats SSL** (après `./docker-init.sh`):
+- **HTTPS** : https://localhost:3443 _(recommandé)_
+- **HTTP** : http://localhost:3000
+
+**Sans certificats SSL** :
+- **HTTP** : http://localhost:3000
+
+⚠️ **Note** : Les certificats SSL sont auto-signés, votre navigateur affichera un avertissement. C'est normal et sécurisé pour un usage local.
 
 ### 4. Se connecter
 
