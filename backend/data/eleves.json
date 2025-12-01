@@ -48,5 +48,15 @@
     "academie": "Académie de Versailles",
     "etablissement": "Lycée Isaac Newton",
     "session": "SESSION 2026"
+  },
+  {
+    "id": 6,
+    "nom": "DUPONT",
+    "prenom": "Marie",
+    "promotion": "2024-2026",
+    "numero_candidat": "2024999",
+    "academie": "Académie de Versailles",
+    "etablissement": "Lycée Isaac Newton",
+    "session": "SESSION 2026"
   }
 ]

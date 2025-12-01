@@ -1,0 +1,10 @@
+{
+  "users": [
+    {
+      "username": "professeur",
+      "password": "$2b$10$XqZJ9Y5bKZ7xH8mK3N4O1.yZGQJ6pXq0L3wK5nM7xZ8pQ2rT4vW6u"
+    }
+  ],
+  "sessionSecret": "CHANGEZ-CE-SECRET-EN-PRODUCTION",
+  "_comment": "Le mot de passe par défaut est 'password123'. Utilisez le script tools/change-password.js pour changer le mot de passe."
+}

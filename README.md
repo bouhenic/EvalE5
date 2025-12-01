@@ -97,9 +97,17 @@ EvalE5/
    npm run dev
    ```
 
-5. **Accéder à l'application**
+5. **Installer l'autorité de certification SSL (première fois uniquement)**
+   ```bash
+   mkcert -install
+   ```
+   Entrez votre mot de passe macOS quand demandé.
+
+6. **Accéder à l'application**
    - Ouvrir un navigateur web
-   - Aller à l'adresse : `http://localhost:3000`
+   - Aller à l'adresse : `https://localhost:3443`
+
+   📘 **Note** : L'application utilise HTTPS pour la sécurité. Voir [HTTPS_INSTALL.md](./HTTPS_INSTALL.md) pour plus de détails.
 
 ## 📖 Guide d'utilisation
 

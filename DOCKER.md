@@ -7,16 +7,29 @@
 
 ## Démarrage rapide avec Docker Compose
 
-### 1. Vérifier la structure des dossiers
-
-Les dossiers `backend/export` et `backend/data` devraient déjà exister. Si ce n'est pas le cas :
+### 1. Préparer les certificats SSL et l'authentification
 
 ```bash
-mkdir -p backend/export backend/data
-chmod 755 backend/export backend/data
+# Générer les certificats SSL (si pas déjà fait)
+./tools/setup-ssl.sh
+
+# Copier le fichier d'authentification exemple (si pas déjà fait)
+cp backend/config/auth.example.json backend/config/auth.json
+
+# Changer le mot de passe (optionnel mais recommandé)
+node tools/change-password.js
 ```
 
-### 2. Lancer l'application
+### 2. Vérifier la structure des dossiers
+
+Les dossiers `backend/export`, `backend/data` et `backend/ssl` devraient déjà exister. Si ce n'est pas le cas :
+
+```bash
+mkdir -p backend/export backend/data backend/ssl
+chmod 755 backend/export backend/data backend/ssl
+```
+
+### 3. Lancer l'application
 
 ```bash
 # Construire et démarrer le conteneur
@@ -29,9 +42,14 @@ docker-compose logs -f
 docker-compose down
 ```
 
-### 3. Accéder à l'application
+### 4. Accéder à l'application
 
-Ouvrir votre navigateur : `http://localhost:3000`
+Ouvrir votre navigateur :
+
+- **HTTPS (recommandé)** : `https://localhost:3443`
+- **HTTP** : `http://localhost:3000`
+
+⚠️ **Note** : Si vous utilisez HTTPS, assurez-vous d'avoir installé l'autorité de certification mkcert sur votre machine hôte avec `mkcert -install`.
 
 ## Commandes Docker manuelles (sans Docker Compose)
 
@@ -47,9 +65,13 @@ docker build -t eval-e5:latest .
 docker run -d \
   --name eval-e5-app \
   -p 3000:3000 \
+  -p 3443:3443 \
   -v $(pwd)/backend/export:/app/backend/export \
   -v $(pwd)/modeles:/app/modeles:ro \
   -v $(pwd)/backend/data:/app/backend/data \
+  -v $(pwd)/backend/ssl:/app/backend/ssl:ro \
+  -v $(pwd)/backend/config/auth.json:/app/backend/config/auth.json:ro \
+  -e HTTPS_PORT=3443 \
   --restart unless-stopped \
   eval-e5:latest
 ```
@@ -69,11 +91,13 @@ docker rm eval-e5-app
 
 ## Volumes montés
 
-| Dossier hôte | Dossier conteneur | Description |
-|--------------|-------------------|-------------|
-| `./backend/export` | `/app/backend/export` | Fichiers Excel générés (lecture/écriture) |
-| `./modeles` | `/app/modeles` | Modèles Excel (lecture seule) |
-| `./backend/data` | `/app/backend/data` | Données des élèves et évaluations (JSON) |
+| Dossier hôte | Dossier conteneur | Mode | Description |
+|--------------|-------------------|------|-------------|
+| `./backend/export` | `/app/backend/export` | RW | Fichiers Excel générés |
+| `./modeles` | `/app/modeles` | RO | Modèles Excel |
+| `./backend/data` | `/app/backend/data` | RW | Données des élèves et évaluations (JSON) |
+| `./backend/ssl` | `/app/backend/ssl` | RO | Certificats SSL (mkcert) |
+| `./backend/config/auth.json` | `/app/backend/config/auth.json` | RO | Configuration authentification |
 
 ## Avantages de cette configuration
 

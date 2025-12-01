@@ -1,4 +1,97 @@
 {
+  "2": {
+    "id": 2,
+    "nom": "ABAID",
+    "prenom": "Soulaimane",
+    "promotion": "2025-2027",
+    "evaluations": {
+      "semestre_1": {
+        "date_evaluation": "2025-12-01T09:34:11.370Z",
+        "commentaire": "",
+        "competences": {
+          "C02": {
+            "criteres": {
+              "c02_c1": {
+                "niveau": 3
+              },
+              "c02_c2": {
+                "niveau": 2
+              },
+              "c02_c3": {
+                "niveau": 3
+              },
+              "c02_c4": {
+                "niveau": 3
+              }
+            }
+          },
+          "C06": {
+            "criteres": {
+              "c06_c1": {
+                "niveau": 3
+              },
+              "c06_c2": {
+                "niveau": 3
+              },
+              "c06_c3": {
+                "niveau": 3
+              },
+              "c06_c4": {
+                "niveau": 3
+              },
+              "c06_c5": {
+                "niveau": 3
+              },
+              "c06_c6": {
+                "niveau": 2
+              }
+            }
+          },
+          "C09": {
+            "criteres": {
+              "c09_c1": {
+                "niveau": 3
+              },
+              "c09_c2": {
+                "niveau": 2
+              },
+              "c09_c3": {
+                "niveau": 2
+              },
+              "c09_c4": {
+                "niveau": 2
+              },
+              "c09_c5": {
+                "niveau": 2
+              },
+              "c09_c6": {
+                "niveau": 2
+              }
+            }
+          },
+          "C11": {
+            "criteres": {
+              "c11_c1": {
+                "niveau": 3
+              },
+              "c11_c2": {
+                "niveau": 3
+              },
+              "c11_c3": {
+                "niveau": 3
+              },
+              "c11_c4": {
+                "niveau": 3
+              },
+              "c11_c5": {
+                "niveau": 3
+              }
+            }
+          }
+        }
+      }
+    }
+  },
   "5": {
     "id": 5,
     "nom": "ASSABIRI",

@@ -6,6 +6,7 @@ services:
     container_name: eval-e5-app
     ports:
       - "3000:3000"
+      - "3443:3443"
     volumes:
       # Monte le dossier export de l'hôte dans le conteneur
       - ./backend/export:/app/backend/export
@@ -13,9 +14,14 @@ services:
       - ./modeles:/app/modeles:ro
       # Monte les données des élèves et évaluations
       - ./backend/data:/app/backend/data
+      # Monte les certificats SSL
+      - ./backend/ssl:/app/backend/ssl:ro
+      # Monte la configuration d'authentification
+      - ./backend/config/auth.json:/app/backend/config/auth.json:ro
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - HTTPS_PORT=3443
     restart: unless-stopped
     networks:
       - eval-network

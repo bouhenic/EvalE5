@@ -23,10 +23,10 @@ RUN npm install --production
 COPY . .
 
 # Créer les dossiers nécessaires (seront montés depuis l'hôte)
-RUN mkdir -p backend/export backend/data
+RUN mkdir -p backend/export backend/data backend/ssl
 
-# Exposer le port de l'application
-EXPOSE 3000
+# Exposer les ports de l'application
+EXPOSE 3000 3443
 
 # Démarrer l'application
 CMD ["npm", "start"]

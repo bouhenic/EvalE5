@@ -18,6 +18,12 @@ npm-debug.log*
 .env
 .env.local
 
+# Fichiers d'authentification - NE PAS COMMITTER
+backend/config/auth.json
+
+# Certificats SSL locaux
+backend/ssl/*.pem
+
 # IDE
 .vscode/
 .idea/

@@ -1,5 +1,5 @@
 // Configuration API
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = 'https://localhost:3443/api';
 
 // Variables globales
 let eleveId = null;
@@ -10,17 +10,37 @@ let evaluationData = null;
 
 // Chargement initial
 document.addEventListener('DOMContentLoaded', () => {
-  // Récupérer l'ID de l'élève depuis l'URL
-  const pathParts = window.location.pathname.split('/');
-  eleveId = pathParts[pathParts.length - 1];
+  // Vérifier l'authentification d'abord
+  verifierAuthentification().then(() => {
+    // Récupérer l'ID de l'élève depuis l'URL
+    const pathParts = window.location.pathname.split('/');
+    eleveId = pathParts[pathParts.length - 1];
 
-  if (!eleveId || isNaN(eleveId)) {
-    afficherErreur('ID élève invalide');
-    return;
-  }
+    if (!eleveId || isNaN(eleveId)) {
+      afficherErreur('ID élève invalide');
+      return;
+    }
 
-  initialiser();
+    initialiser();
+  });
 });
+
+/**
+ * Vérifie si l'utilisateur est authentifié
+ */
+async function verifierAuthentification() {
+  try {
+    const response = await fetch(`${API_BASE}/auth/check`);
+    const data = await response.json();
+
+    if (!data.authenticated) {
+      window.location.href = '/login.html';
+    }
+  } catch (error) {
+    console.error('Erreur de vérification:', error);
+    window.location.href = '/login.html';
+  }
+}
 
 /**
  * Initialise la page

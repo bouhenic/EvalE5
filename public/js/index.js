@@ -1,5 +1,5 @@
 // Configuration API
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = 'https://localhost:3443/api';
 
 // Variables globales
 let tousLesEleves = [];
@@ -7,8 +7,41 @@ let promotionSelectionnee = '';
 
 // Chargement initial
 document.addEventListener('DOMContentLoaded', () => {
+  verifierAuthentification();
   chargerEleves();
 });
+
+/**
+ * Vérifie si l'utilisateur est authentifié
+ */
+async function verifierAuthentification() {
+  try {
+    const response = await fetch(`${API_BASE}/auth/check`);
+    const data = await response.json();
+
+    if (data.authenticated) {
+      document.getElementById('username-display').textContent = `Connecté: ${data.username}`;
+    } else {
+      window.location.href = '/login.html';
+    }
+  } catch (error) {
+    console.error('Erreur de vérification:', error);
+    window.location.href = '/login.html';
+  }
+}
+
+/**
+ * Déconnexion
+ */
+async function deconnexion() {
+  try {
+    await fetch(`${API_BASE}/auth/logout`, { method: 'POST' });
+    window.location.href = '/login.html';
+  } catch (error) {
+    console.error('Erreur de déconnexion:', error);
+    window.location.href = '/login.html';
+  }
+}
 
 /**
  * Charge les notes d'un élève
