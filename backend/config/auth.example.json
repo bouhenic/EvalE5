@@ -2,7 +2,7 @@
   "users": [
     {
       "username": "professeur",
-      "password": "$2b$10$XqZJ9Y5bKZ7xH8mK3N4O1.yZGQJ6pXq0L3wK5nM7xZ8pQ2rT4vW6u"
+      "password": "$2b$10$chvKXKFiPOxaGyUen29ne.L1PAihgE7I/N1u55o1llsLVZ1ZOtrIK"
     }
   ],
   "sessionSecret": "CHANGEZ-CE-SECRET-EN-PRODUCTION",
