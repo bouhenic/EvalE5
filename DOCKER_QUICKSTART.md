@@ -152,16 +152,39 @@ docker exec -it eval-e5-app /bin/bash
 
 ## 🔄 Mise à jour de l'application
 
+### Méthode automatique (recommandée)
+
+```bash
+./docker-update.sh
+```
+
+Ce script va automatiquement :
+1. Récupérer les dernières modifications depuis GitHub
+2. Arrêter le conteneur actuel
+3. Reconstruire l'image Docker (sans cache)
+4. Redémarrer le conteneur
+5. Afficher les logs
+
+### Méthode manuelle
+
 ```bash
 # 1. Récupérer les dernières modifications
 git pull
 
-# 2. Reconstruire l'image
-docker-compose build
+# 2. Arrêter le conteneur
+docker-compose down
 
-# 3. Redémarrer avec la nouvelle image
+# 3. Reconstruire l'image SANS CACHE (important !)
+docker-compose build --no-cache
+
+# 4. Redémarrer
 docker-compose up -d
+
+# 5. Vérifier les logs
+docker-compose logs -f
 ```
+
+⚠️ **IMPORTANT** : Utilisez toujours `--no-cache` lors de la reconstruction pour vous assurer que les derniers fichiers JavaScript sont inclus dans l'image.
 
 ## 🗑️ Réinitialisation complète
 
