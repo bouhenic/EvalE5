@@ -1,5 +1,15 @@
 # Déploiement Docker
 
+## 🚀 Démarrage Rapide
+
+**Si vous venez de cloner le dépôt**, consultez le guide de démarrage rapide :
+
+👉 **[DOCKER_QUICKSTART.md](./DOCKER_QUICKSTART.md)** 👈
+
+Ce guide contient toutes les étapes pour initialiser et démarrer l'application en quelques minutes.
+
+---
+
 ## Prérequis
 
 - Docker installé sur l'hôte

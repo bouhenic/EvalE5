@@ -2,6 +2,23 @@
 
 Application web complète pour l'évaluation des étudiants de BTS Cybersécurité, Informatique et Réseaux, Électronique (CIEL) - Épreuve E5 : Exploitation et maintenance de réseaux informatiques.
 
+## 🐳 Démarrage Rapide avec Docker
+
+**Nouvelle machine ? Utilisez Docker !**
+
+```bash
+git clone https://github.com/bouhenic/EvalE5.git
+cd EvalE5
+./docker-init.sh
+docker-compose up -d
+```
+
+👉 Accédez à https://localhost:3443
+
+📖 Guide complet : [DOCKER_QUICKSTART.md](./DOCKER_QUICKSTART.md)
+
+---
+
 ## 📋 Description
 
 Cette application permet aux enseignants de :
@@ -10,6 +27,8 @@ Cette application permet aux enseignants de :
 - **Générer automatiquement des fichiers Excel individuels** conformes au modèle officiel du ministère
 - **Sauvegarder des brouillons** d'évaluation en format JSON
 - **Finaliser et remplir automatiquement** les fichiers Excel avec les notes
+- **🔐 Authentification sécurisée** pour protéger l'accès
+- **🔒 HTTPS** pour chiffrer les communications
 
 ## ✨ Fonctionnalités principales
 
