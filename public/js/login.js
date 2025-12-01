@@ -6,7 +6,9 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const errorMessage = document.getElementById('error-message');
 
     try {
-        const response = await fetch('https://localhost:3443/api/auth/login', {
+        // URL dynamique qui s'adapte au protocole (HTTP ou HTTPS)
+        const loginUrl = `${window.location.protocol}//${window.location.host}/api/auth/login`;
+        const response = await fetch(loginUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

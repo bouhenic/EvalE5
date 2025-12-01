@@ -1,5 +1,5 @@
-// Configuration API
-const API_BASE = 'https://localhost:3443/api';
+// Configuration API dynamique (adapte automatiquement HTTP ou HTTPS)
+const API_BASE = `${window.location.protocol}//${window.location.host}/api`;
 
 // Variables globales
 let eleveId = null;
