@@ -4,9 +4,13 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 
-// Charger les utilisateurs
+// Chemin vers le fichier de configuration
 const authConfigPath = path.join(__dirname, '../config/auth.json');
-let authConfig = JSON.parse(fs.readFileSync(authConfigPath, 'utf8'));
+
+// Fonction pour charger la configuration (recharge à chaque appel)
+function loadAuthConfig() {
+    return JSON.parse(fs.readFileSync(authConfigPath, 'utf8'));
+}
 
 // Route de connexion
 router.post('/login', async (req, res) => {
@@ -15,6 +19,9 @@ router.post('/login', async (req, res) => {
     if (!username || !password) {
         return res.status(400).json({ error: 'Nom d\'utilisateur et mot de passe requis' });
     }
+
+    // Recharger la configuration à chaque tentative de connexion
+    const authConfig = loadAuthConfig();
 
     // Rechercher l'utilisateur
     const user = authConfig.users.find(u => u.username === username);
@@ -75,6 +82,8 @@ router.post('/change-password', async (req, res) => {
         return res.status(400).json({ error: 'Ancien et nouveau mot de passe requis' });
     }
 
+    // Recharger la configuration
+    const authConfig = loadAuthConfig();
     const user = authConfig.users.find(u => u.username === req.session.username);
 
     // Vérifier l'ancien mot de passe
