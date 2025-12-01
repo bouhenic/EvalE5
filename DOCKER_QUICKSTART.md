@@ -2,19 +2,23 @@
 
 ## 🚀 Installation rapide sur une nouvelle machine
 
-Si vous venez de cloner le dépôt sur une nouvelle machine, suivez ces étapes :
+Si vous venez de cloner le dépôt sur une nouvelle machine, suivez ces étapes **DANS L'ORDRE** :
 
-### 1. Initialiser l'environnement
+### 1. Initialiser l'environnement (⚠️ OBLIGATOIRE)
 
 ```bash
 ./docker-init.sh
 ```
+
+**⚠️ IMPORTANT** : Vous **DEVEZ** exécuter ce script **AVANT** `docker-compose up` !
 
 Ce script va :
 - ✅ Créer les dossiers nécessaires (`backend/export`, `backend/data`, `backend/ssl`)
 - ✅ Créer le fichier `backend/config/auth.json` depuis l'exemple
 - ✅ Générer des certificats SSL auto-signés
 - ✅ Vérifier que tout est prêt
+
+Sans ce script, Docker ne pourra pas démarrer correctement.
 
 ### 2. Démarrer l'application
 
@@ -82,11 +86,27 @@ docker-compose up -d --build
 
 ## ❓ Problèmes courants
 
+### Erreur "Are you trying to mount a directory onto a file (or vice-versa)?"
+
+**Message complet** :
+```
+error mounting "/home/user/EvalE5/backend/config/auth.json" to rootfs
+```
+
+**Cause** : Le fichier `auth.json` n'existe pas avant le démarrage de Docker. Docker crée un dossier vide à la place, causant une erreur de montage.
+
+**Solution** : Exécutez le script d'initialisation **AVANT** `docker-compose up`
+```bash
+./docker-init.sh
+docker-compose up -d
+```
+
 ### Erreur "Cannot find module 'backend/config/auth.json'"
 
 **Solution** : Exécutez le script d'initialisation
 ```bash
 ./docker-init.sh
+docker-compose restart
 ```
 
 ### Erreur "ENOENT: no such file or directory, open 'backend/ssl/localhost+2.pem'"
@@ -94,6 +114,7 @@ docker-compose up -d --build
 **Solution** : Exécutez le script d'initialisation
 ```bash
 ./docker-init.sh
+docker-compose restart
 ```
 
 ### Port déjà utilisé

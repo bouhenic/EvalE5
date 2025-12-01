@@ -16,8 +16,8 @@ services:
       - ./backend/data:/app/backend/data
       # Monte les certificats SSL
       - ./backend/ssl:/app/backend/ssl:ro
-      # Monte la configuration d'authentification
-      - ./backend/config/auth.json:/app/backend/config/auth.json:ro
+      # Monte tout le dossier config (contient auth.json et mapping.json)
+      - ./backend/config:/app/backend/config
     environment:
       - NODE_ENV=production
       - PORT=3000

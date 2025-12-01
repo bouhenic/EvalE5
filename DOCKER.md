@@ -80,7 +80,7 @@ docker run -d \
   -v $(pwd)/modeles:/app/modeles:ro \
   -v $(pwd)/backend/data:/app/backend/data \
   -v $(pwd)/backend/ssl:/app/backend/ssl:ro \
-  -v $(pwd)/backend/config/auth.json:/app/backend/config/auth.json:ro \
+  -v $(pwd)/backend/config:/app/backend/config \
   -e HTTPS_PORT=3443 \
   --restart unless-stopped \
   eval-e5:latest
@@ -106,8 +106,8 @@ docker rm eval-e5-app
 | `./backend/export` | `/app/backend/export` | RW | Fichiers Excel générés |
 | `./modeles` | `/app/modeles` | RO | Modèles Excel |
 | `./backend/data` | `/app/backend/data` | RW | Données des élèves et évaluations (JSON) |
-| `./backend/ssl` | `/app/backend/ssl` | RO | Certificats SSL (mkcert) |
-| `./backend/config/auth.json` | `/app/backend/config/auth.json` | RO | Configuration authentification |
+| `./backend/ssl` | `/app/backend/ssl` | RO | Certificats SSL |
+| `./backend/config` | `/app/backend/config` | RW | Configuration (auth.json, mapping.json, config.json) |
 
 ## Avantages de cette configuration
 

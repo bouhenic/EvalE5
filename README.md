@@ -9,11 +9,11 @@ Application web complète pour l'évaluation des étudiants de BTS Cybersécurit
 ```bash
 git clone https://github.com/bouhenic/EvalE5.git
 cd EvalE5
-./docker-init.sh
+./docker-init.sh          # ⚠️ OBLIGATOIRE avant docker-compose !
 docker-compose up -d
 ```
 
-👉 Accédez à https://localhost:3443
+👉 Accédez à https://localhost:3443 ou http://localhost:3000
 
 📖 Guide complet : [DOCKER_QUICKSTART.md](./DOCKER_QUICKSTART.md)
 
