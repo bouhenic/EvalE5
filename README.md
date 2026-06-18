@@ -22,22 +22,26 @@ docker-compose up -d
 ## 📋 Description
 
 Cette application permet aux enseignants de :
-- **Gérer une liste d'élèves** avec leurs informations personnelles
+- **Gérer une liste d'élèves** (ajout, modification, suppression simple ou **multiple**)
+- **Importer une classe depuis un PDF** Index Education / Pronote en un clic
 - **Évaluer par semestre** (4 semestres) les compétences techniques et transversales
+- **S'appuyer sur les aides au positionnement** officielles, affichées au survol des critères
 - **Générer automatiquement des fichiers Excel individuels** conformes au modèle officiel du ministère
 - **Sauvegarder des brouillons** d'évaluation en format JSON
 - **Finaliser et remplir automatiquement** les fichiers Excel avec les notes
-- **🔐 Authentification sécurisée** pour protéger l'accès
-- **🔒 HTTPS** pour chiffrer les communications
+- **Imprimer une synthèse** filtrée par promotion
+- **🔐 Authentification sécurisée** (avec changement de mot de passe) et **🔒 HTTPS**
 
 ## ✨ Fonctionnalités principales
 
 ### 🏠 Page d'accueil
-- Liste complète des élèves
+- Liste des élèves avec filtre par promotion
+- Ajout d'un élève, **import d'une classe entière depuis un PDF**
+- **Sélection multiple** (cases à cocher) et suppression groupée
 - Statut de génération du fichier Excel par élève
-- Génération de fichiers Excel individuels
-- Téléchargement des fichiers Excel
+- Génération et téléchargement des fichiers Excel individuels
 - Accès direct à l'évaluation de chaque élève
+- Impression d'une synthèse (filtrée sur la promotion sélectionnée)
 
 ### 📝 Page d'évaluation
 - Sélection du semestre à évaluer
@@ -47,6 +51,7 @@ Cette application permet aux enseignants de :
   - **C09** : Installer un réseau informatique
   - **C11** : Maintenir un réseau informatique
 - Système de notation à 4 niveaux pour chaque critère
+- **Aides au positionnement** (reprises de la grille officielle) affichées au survol de l'icône ℹ️
 - Commentaires globaux
 - Sauvegarde en brouillon (JSON)
 - Finalisation et export vers Excel
@@ -58,28 +63,37 @@ EvalE5/
 ├── backend/
 │   ├── config/
 │   │   ├── config.json          # Configuration générale
-│   │   └── mapping.json         # Mapping des cellules Excel
+│   │   ├── mapping.json         # Mapping cellules Excel + aides au positionnement
+│   │   └── auth.json            # Utilisateurs (non versionné, cf. auth.example.json)
 │   ├── data/
-│   │   ├── eleves.json          # Liste des élèves
-│   │   └── evaluations.json     # Données d'évaluation
+│   │   ├── eleves.json          # Liste des élèves (non versionné : données réelles)
+│   │   └── evaluations.json     # Données d'évaluation (non versionné)
+│   ├── middleware/
+│   │   └── auth.js              # Protection des routes par session
 │   ├── routes/
-│   │   └── api.js               # Routes API Express
+│   │   ├── api.js               # Routes API Express
+│   │   └── auth.js              # Login / logout / changement de mot de passe
 │   ├── services/
-│   │   ├── excelService.js      # Service de manipulation Excel
-│   │   └── dataService.js       # Service de gestion des données
+│   │   ├── excelService.js      # Manipulation Excel (génération, remplissage)
+│   │   ├── dataService.js       # Données + renumérotation/dédoublonnage
+│   │   └── pdfImportService.js  # Extraction d'élèves depuis un PDF (pdftotext)
 │   ├── export/                  # Fichiers Excel générés
-│   └── server.js                # Serveur Express
+│   └── server.js                # Serveur Express (HTTP + HTTPS)
 ├── frontend/
 │   ├── index.html               # Page d'accueil
-│   └── evaluation.html          # Page d'évaluation
+│   ├── evaluation.html          # Page d'évaluation
+│   ├── login.html               # Page de connexion
+│   └── change-password.html     # Changement de mot de passe
 ├── public/
-│   ├── css/
-│   │   └── styles.css           # Styles CSS
-│   └── js/
-│       ├── index.js             # Script page d'accueil
-│       └── evaluation.js        # Script page d'évaluation
+│   ├── css/styles.css
+│   ├── images/logo.png
+│   └── js/                      # index.js, evaluation.js, login.js, change-password.js
+├── tools/
+│   └── import-eleves-pdf.js     # Import d'élèves en ligne de commande
 ├── modeles/
 │   └── modele_officiel.xlsx     # Modèle Excel du ministère
+├── grille.xlsx                  # Grille officielle (source des aides au positionnement)
+├── Dockerfile / docker-compose.yml
 ├── package.json
 └── README.md
 ```
@@ -89,6 +103,9 @@ EvalE5/
 ### Prérequis
 - Node.js (v14 ou supérieur)
 - npm (v6 ou supérieur)
+- **poppler-utils** (commande `pdftotext`) pour l'import depuis un PDF
+  (macOS : `brew install poppler` ; Debian/Ubuntu : `apt-get install poppler-utils`).
+  Déjà inclus dans l'image Docker.
 
 ### Étapes d'installation
 
@@ -133,19 +150,26 @@ EvalE5/
 ### 1️⃣ Gestion des élèves
 
 #### Ajouter un élève
-Modifier le fichier `backend/data/eleves.json` :
-```json
-{
-  "id": 4,
-  "nom": "Nouveau",
-  "prenom": "Eleve",
-  "classe": "BTS CIEL 1",
-  "numero_candidat": "2024004",
-  "academie": "Académie de Paris",
-  "etablissement": "Lycée Exemple",
-  "session": "SESSION 2024"
-}
+Depuis la page d'accueil, bouton **« ➕ Ajouter un élève »** (formulaire).
+
+#### Importer une classe depuis un PDF
+1. Bouton **« 📥 Importer un PDF »** (export « Liste des élèves par classe » d'Index Education / Pronote).
+2. Choisir le fichier, indiquer la **promotion** (format `AAAA-AAAA`, ex. `2024-2026`).
+3. Les élèves déjà présents (même nom/prénom) sont ignorés ; les nouveaux sont ajoutés.
+
+En ligne de commande (équivalent) :
+```bash
+node tools/import-eleves-pdf.js <fichier.pdf> --promotion 2024-2026 [--replace] [--dry-run]
 ```
+
+#### Supprimer plusieurs élèves
+Cocher les cases des élèves concernés puis **« 🗑️ Supprimer la sélection »**.
+
+#### Identifiants
+À l'ajout/import, l'`id` et le `numero_candidat` sont attribués automatiquement au
+format **`AAAA` (année de fin) + rang dans la classe** (ex. promotion `2024-2026` →
+`202601`, `202602`…), par ordre alphabétique. Les évaluations suivent automatiquement
+en cas de renumérotation.
 
 #### Générer le fichier Excel d'un élève
 1. Sur la page d'accueil, cliquer sur **"📄 Générer Excel"**
@@ -216,6 +240,23 @@ Modifier `backend/config/config.json` :
 
 ## 📊 Structure des données
 
+### Format d'un élève (JSON)
+```json
+{
+  "id": 202601,
+  "nom": "AMROUNI",
+  "prenom": "Aghiles",
+  "promotion": "2024-2026",
+  "numero_candidat": "202601",
+  "academie": "Académie de Versailles",
+  "etablissement": "Lycée Isaac Newton",
+  "session": "SESSION 2026"
+}
+```
+> `id` et `numero_candidat` sont gérés automatiquement (année de fin + rang dans la
+> promotion). Les fichiers `eleves.json` / `evaluations.json` ne sont **pas versionnés**
+> (données réelles d'élèves).
+
 ### Format d'évaluation (JSON)
 ```json
 {
@@ -275,8 +316,9 @@ Les formules Excel sont **préservées** lors du remplissage automatique.
 
 ## 🛠️ Technologies utilisées
 
-- **Backend** : Node.js, Express.js
+- **Backend** : Node.js, Express.js (sessions + bcrypt)
 - **Manipulation Excel** : xlsx-populate (préservation complète des fichiers Excel complexes)
+- **Lecture Excel / import PDF** : exceljs, poppler (`pdftotext`)
 - **Frontend** : HTML5, CSS3, JavaScript Vanilla
 - **Stockage** : JSON (fichiers locaux)
 
@@ -290,17 +332,28 @@ Les formules Excel sont **préservées** lors du remplissage automatique.
 
 ## 📝 API Endpoints
 
+Toutes les routes `/api/*` (sauf `/api/auth/*`) requièrent une session authentifiée.
+
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
 | GET | `/api/eleves` | Liste tous les élèves |
 | GET | `/api/eleves/:id` | Récupère un élève |
+| POST | `/api/eleves` | Ajoute un élève |
+| PUT | `/api/eleves/:id` | Modifie un élève |
+| DELETE | `/api/eleves/:id` | Supprime un élève |
+| POST | `/api/eleves/import-pdf` | Importe des élèves depuis un PDF (base64) |
+| POST | `/api/eleves/supprimer-multiple` | Supprime plusieurs élèves (`{ ids: [...] }`) |
 | POST | `/api/eleves/:id/generer-excel` | Génère le fichier Excel |
 | GET | `/api/eleves/:id/evaluations/:semestre` | Récupère l'évaluation d'un semestre |
 | POST | `/api/eleves/:id/evaluations/:semestre/save` | Sauvegarde brouillon |
 | POST | `/api/eleves/:id/evaluations/:semestre/finaliser` | Finalise et remplit Excel |
 | GET | `/api/eleves/:id/telecharger` | Télécharge le fichier Excel |
-| GET | `/api/config/mapping` | Récupère le mapping |
-| GET | `/api/config` | Récupère la configuration |
+| GET | `/api/eleves/:id/notes` | Notes calculées d'un élève |
+| GET | `/api/config` / `/api/config/mapping` | Configuration et mapping |
+| POST | `/api/cache/reset` | Réinitialise le cache d'existence des fichiers Excel |
+| POST | `/api/auth/login` / `/logout` | Connexion / déconnexion |
+| GET | `/api/auth/check` | État d'authentification |
+| POST | `/api/auth/change-password` | Change le mot de passe |
 
 ## 🐛 Dépannage
 
@@ -328,5 +381,5 @@ Pour toute question ou problème, contacter l'administrateur de l'application.
 
 ---
 
-**Version** : 1.0.0
-**Dernière mise à jour** : Novembre 2024
+**Version** : 1.1.0
+**Dernière mise à jour** : Juin 2026
