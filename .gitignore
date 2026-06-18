@@ -33,3 +33,6 @@ backend/ssl/*.pem
 # Build
 dist/
 build/
+
+# Artefacts de session / test
+cookies.txt

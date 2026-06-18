@@ -121,30 +121,38 @@ async function chargerEleves() {
 }
 
 /**
- * Met à jour le sélecteur de promotion avec les promotions disponibles
+ * Met à jour le filtre de promotion dans la colonne
  */
 async function mettreAJourSelecteurPromotion() {
-  const selectPromotion = document.getElementById('filtre-promotion');
+  const filterSelect = document.getElementById('filter-promotion-select');
 
   // Extraire les promotions uniques (en utilisant classe ou promotion)
   const promotions = [...new Set(tousLesEleves.map(e => e.promotion || e.classe))].sort().reverse();
 
-  // Vider les options actuelles sauf "Toutes les promotions"
-  selectPromotion.innerHTML = '<option value="">Toutes les promotions</option>';
+  // Vider les options actuelles (garder "Toutes")
+  filterSelect.innerHTML = '<option value="">Toutes les promotions</option>';
 
   // Ajouter les promotions
   promotions.forEach(promo => {
+    const count = tousLesEleves.filter(e => (e.promotion || e.classe) === promo).length;
     const option = document.createElement('option');
     option.value = promo;
-    option.textContent = promo;
-    selectPromotion.appendChild(option);
+    option.textContent = `${promo} (${count})`;
+    filterSelect.appendChild(option);
   });
 
-  // Sélectionner automatiquement la première promotion (la plus récente)
+  // Sélectionner automatiquement la première promotion si aucune sélection
   if (promotions.length > 0 && !promotionSelectionnee) {
     promotionSelectionnee = promotions[0];
-    selectPromotion.value = promotionSelectionnee;
+    filterSelect.value = promotionSelectionnee;
   }
+
+  // Écouteur de changement attaché une seule fois (onchange remplace
+  // l'éventuel précédent -> pas d'accumulation de handlers / de rendus).
+  filterSelect.onchange = function() {
+    promotionSelectionnee = this.value;
+    afficherElevesFiltre();
+  };
 }
 
 /**
@@ -160,66 +168,72 @@ async function afficherElevesFiltre() {
     ? tousLesEleves.filter(e => (e.promotion || e.classe) === promotionSelectionnee)
     : tousLesEleves;
 
-  // Remplir le tableau
-  tbody.innerHTML = '';
+  // Marqueur de rendu : si un nouveau rendu démarre pendant nos await,
+  // celui-ci s'interrompt avant d'écrire le DOM (évite tout doublon d'affichage).
+  const renduCourant = (afficherElevesFiltre._gen = (afficherElevesFiltre._gen || 0) + 1);
 
-  for (const eleve of elevesFiltres) {
-    const tr = document.createElement('tr');
+  // Charger toutes les notes en parallèle (un seul point d'await).
+  const notesParEleve = await Promise.all(
+    elevesFiltres.map(eleve => chargerNotesEleve(eleve.id))
+  );
+  if (renduCourant !== afficherElevesFiltre._gen) return;
 
-    // Charger les notes de l'élève
-    const notes = await chargerNotesEleve(eleve.id);
-    const celluleMoyenne = formaterCelluleMoyenne(notes);
-
-    // Statut du fichier Excel
+  // Construire toutes les lignes puis écrire le tbody en une seule fois.
+  const lignes = elevesFiltres.map((eleve, i) => {
+    const celluleMoyenne = formaterCelluleMoyenne(notesParEleve[i]);
     const statutExcel = eleve.fichierExiste
       ? '<span class="badge badge-success">✓ Généré</span>'
       : '<span class="badge badge-warning">⚠ Non généré</span>';
-
-    // Utiliser promotion si disponible, sinon classe
     const promotion = eleve.promotion || eleve.classe;
 
-    tr.innerHTML = `
-      <td>${eleve.id}</td>
-      <td>${eleve.nom}</td>
-      <td>${eleve.prenom}</td>
-      <td>${promotion}</td>
-      ${celluleMoyenne}
-      <td>${eleve.numero_candidat}</td>
-      <td>${statutExcel}</td>
-      <td class="actions">
-        ${!eleve.fichierExiste
-          ? `<button class="btn btn-primary btn-sm" onclick="genererExcel(${eleve.id}, '${eleve.nom}', '${eleve.prenom}')">
-              📄 Générer Excel
-            </button>`
-          : `<button class="btn btn-info btn-sm" onclick="telechargerExcel(${eleve.id})">
-              💾 Télécharger
-            </button>`
-        }
-        <button class="btn btn-success btn-sm" onclick="evaluer(${eleve.id})">
-          ✏️ Évaluer
-        </button>
-        <button class="btn btn-danger btn-sm" onclick="supprimerEleve(${eleve.id}, '${eleve.nom}', '${eleve.prenom}')">
-          🗑️ Supprimer
-        </button>
-      </td>
+    return `
+      <tr>
+        <td class="col-select"><input type="checkbox" class="row-check" value="${eleve.id}" onchange="onSelectionChange()"></td>
+        <td>${eleve.id}</td>
+        <td>${eleve.nom}</td>
+        <td>${eleve.prenom}</td>
+        <td>${promotion}</td>
+        ${celluleMoyenne}
+        <td>${statutExcel}</td>
+        <td class="actions">
+          <div class="dropdown" id="dropdown-${eleve.id}">
+            <button class="dropdown-toggle" onclick="toggleDropdown(${eleve.id})">
+              ⚙️ Actions
+            </button>
+            <div class="dropdown-menu" id="dropdown-menu-${eleve.id}">
+              ${!eleve.fichierExiste
+                ? `<button class="dropdown-item" onclick="genererExcel(${eleve.id}, '${eleve.nom}', '${eleve.prenom}')">
+                    📄 Générer Excel
+                  </button>`
+                : `<button class="dropdown-item" onclick="telechargerExcel(${eleve.id})">
+                    💾 Télécharger Excel
+                  </button>`
+              }
+              <button class="dropdown-item" onclick="evaluer(${eleve.id})">
+                ✏️ Évaluer
+              </button>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item danger" onclick="supprimerEleve(${eleve.id}, '${eleve.nom}', '${eleve.prenom}')">
+                🗑️ Supprimer
+              </button>
+            </div>
+          </div>
+        </td>
+      </tr>
     `;
+  });
 
-    tbody.appendChild(tr);
-  }
+  tbody.innerHTML = lignes.join('');
 
   // Afficher le tableau et le compteur
   table.style.display = 'table';
   countEleves.textContent = `${elevesFiltres.length} élève(s)` +
     (promotionSelectionnee ? ` (promotion ${promotionSelectionnee})` : '');
-}
 
-/**
- * Filtre les élèves par promotion
- */
-async function filtrerParPromotion() {
-  const selectPromotion = document.getElementById('filtre-promotion');
-  promotionSelectionnee = selectPromotion.value;
-  await afficherElevesFiltre();
+  // Réinitialiser la sélection après reconstruction du tableau
+  const checkAll = document.getElementById('check-all');
+  if (checkAll) checkAll.checked = false;
+  onSelectionChange();
 }
 
 /**
@@ -281,11 +295,64 @@ function evaluer(id) {
 }
 
 /**
+ * Ouvre la modal des paramètres
+ */
+function ouvrirModalParametres() {
+  // Fermer le dropdown
+  document.getElementById('dropdown-menu-gestion').classList.remove('show');
+
+  // Charger les paramètres actuels depuis localStorage
+  const academie = localStorage.getItem('academie') || 'Académie de Versailles';
+  const etablissement = localStorage.getItem('etablissement') || 'Lycée Isaac Newton';
+
+  document.getElementById('param-academie').value = academie;
+  document.getElementById('param-etablissement').value = etablissement;
+
+  document.getElementById('modal-parametres').style.display = 'flex';
+}
+
+/**
+ * Ferme la modal des paramètres
+ */
+function fermerModalParametres() {
+  document.getElementById('modal-parametres').style.display = 'none';
+}
+
+/**
+ * Sauvegarde les paramètres d'établissement
+ */
+function sauvegarderParametres(event) {
+  event.preventDefault();
+
+  const academie = document.getElementById('param-academie').value;
+  const etablissement = document.getElementById('param-etablissement').value;
+
+  // Sauvegarder dans localStorage
+  localStorage.setItem('academie', academie);
+  localStorage.setItem('etablissement', etablissement);
+
+  alert('✅ Paramètres sauvegardés avec succès !\n\nCes informations seront utilisées lors de l\'ajout de nouveaux élèves.');
+
+  fermerModalParametres();
+
+  // Mettre à jour les valeurs par défaut dans le formulaire d'ajout d'élève
+  document.getElementById('academie').value = academie;
+  document.getElementById('etablissement').value = etablissement;
+}
+
+/**
  * Ouvre la modal d'ajout d'élève
  */
 function ouvrirModalAjout() {
   document.getElementById('modal-ajout-eleve').style.display = 'flex';
   document.getElementById('form-ajout-eleve').reset();
+
+  // Pré-remplir avec les paramètres sauvegardés
+  const academie = localStorage.getItem('academie') || 'Académie de Versailles';
+  const etablissement = localStorage.getItem('etablissement') || 'Lycée Isaac Newton';
+
+  document.getElementById('academie').value = academie;
+  document.getElementById('etablissement').value = etablissement;
 }
 
 /**
@@ -336,6 +403,161 @@ async function ajouterEleve(event) {
 }
 
 /**
+ * Ouvre la modal d'import PDF
+ */
+function ouvrirModalImport() {
+  document.getElementById('form-import-pdf').reset();
+
+  // Pré-remplir avec les paramètres sauvegardés
+  document.getElementById('import-academie').value =
+    localStorage.getItem('academie') || 'Académie de Versailles';
+  document.getElementById('import-etablissement').value =
+    localStorage.getItem('etablissement') || 'Lycée Isaac Newton';
+
+  document.getElementById('modal-import-pdf').style.display = 'flex';
+}
+
+/**
+ * Ferme la modal d'import PDF
+ */
+function fermerModalImport() {
+  document.getElementById('modal-import-pdf').style.display = 'none';
+}
+
+/**
+ * Lit un fichier et renvoie son contenu en data-URL base64
+ */
+function lireFichierBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Lecture du fichier impossible'));
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
+ * Importe des élèves depuis un PDF
+ */
+async function importerPdf(event) {
+  event.preventDefault();
+
+  const fichier = document.getElementById('import-fichier').files[0];
+  if (!fichier) {
+    alert('❌ Veuillez sélectionner un fichier PDF.');
+    return;
+  }
+
+  const submitBtn = document.getElementById('import-submit');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = '⏳ Import en cours...';
+
+  try {
+    const pdfBase64 = await lireFichierBase64(fichier);
+
+    const response = await fetch(`${API_BASE}/eleves/import-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pdfBase64,
+        promotion: document.getElementById('import-promotion').value.trim(),
+        academie: document.getElementById('import-academie').value.trim(),
+        etablissement: document.getElementById('import-etablissement').value.trim(),
+        replace: document.getElementById('import-replace').checked
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erreur lors de l\'import');
+    }
+
+    const result = await response.json();
+    let msg = `✅ ${result.ajoutes.length} élève(s) importé(s) sur ${result.lus} lus.`;
+    if (result.ignores && result.ignores.length) {
+      msg += `\n\n⏭️ Déjà présents (ignorés) : ${result.ignores.join(', ')}`;
+    }
+    alert(msg);
+
+    fermerModalImport();
+    chargerEleves();
+
+  } catch (err) {
+    console.error('Erreur:', err);
+    alert(`❌ Erreur: ${err.message}`);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
+}
+
+/**
+ * Coche/décoche toutes les lignes
+ */
+function toggleSelectAll(source) {
+  document.querySelectorAll('.row-check').forEach(cb => { cb.checked = source.checked; });
+  onSelectionChange();
+}
+
+/**
+ * Renvoie les ids des élèves sélectionnés
+ */
+function getIdsSelectionnes() {
+  return Array.from(document.querySelectorAll('.row-check:checked'))
+    .map(cb => parseInt(cb.value));
+}
+
+/**
+ * Met à jour le bouton de suppression groupée selon la sélection
+ */
+function onSelectionChange() {
+  const ids = getIdsSelectionnes();
+  const btn = document.getElementById('btn-supprimer-selection');
+  const count = document.getElementById('count-selection');
+  if (count) count.textContent = ids.length;
+  if (btn) btn.disabled = ids.length === 0;
+
+  // Synchroniser l'état de la case "tout sélectionner"
+  const checkAll = document.getElementById('check-all');
+  const total = document.querySelectorAll('.row-check').length;
+  if (checkAll) checkAll.checked = total > 0 && ids.length === total;
+}
+
+/**
+ * Supprime tous les élèves sélectionnés
+ */
+async function supprimerSelection() {
+  const ids = getIdsSelectionnes();
+  if (ids.length === 0) return;
+
+  if (!confirm(`Supprimer les ${ids.length} élève(s) sélectionné(s) ?\n\nCette action est irréversible et supprimera aussi toutes leurs évaluations.`)) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/eleves/supprimer-multiple`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erreur lors de la suppression');
+    }
+
+    const result = await response.json();
+    alert(`✅ ${result.message}`);
+    chargerEleves();
+
+  } catch (err) {
+    console.error('Erreur:', err);
+    alert(`❌ Erreur: ${err.message}`);
+  }
+}
+
+/**
  * Supprime un élève
  */
 async function supprimerEleve(id, nom, prenom) {
@@ -362,4 +584,249 @@ async function supprimerEleve(id, nom, prenom) {
     console.error('Erreur:', err);
     alert(`❌ Erreur: ${err.message}`);
   }
+}
+
+/**
+ * Toggle le dropdown des actions
+ */
+function toggleDropdown(eleveId) {
+  const menu = document.getElementById(`dropdown-menu-${eleveId}`);
+  const allMenus = document.querySelectorAll('.dropdown-menu');
+
+  // Fermer tous les autres dropdowns
+  allMenus.forEach(m => {
+    if (m.id !== `dropdown-menu-${eleveId}`) {
+      m.classList.remove('show');
+    }
+  });
+
+  // Toggle le dropdown courant
+  menu.classList.toggle('show');
+
+  // Arrêter la propagation pour éviter la fermeture immédiate
+  event.stopPropagation();
+}
+
+// Fermer les dropdowns quand on clique ailleurs
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('.dropdown')) {
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      menu.classList.remove('show');
+    });
+  }
+});
+
+/**
+ * Toggle le dropdown de gestion
+ */
+function toggleDropdownGestion(event) {
+  const menu = document.getElementById('dropdown-menu-gestion');
+  const allMenus = document.querySelectorAll('.dropdown-menu');
+
+  // Fermer tous les autres dropdowns
+  allMenus.forEach(m => {
+    if (m.id !== 'dropdown-menu-gestion') {
+      m.classList.remove('show');
+    }
+  });
+
+  // Toggle le dropdown courant
+  menu.classList.toggle('show');
+
+  // Arrêter la propagation pour éviter la fermeture immédiate
+  event.stopPropagation();
+}
+
+/**
+ * Imprime la synthèse des élèves (format portrait)
+ */
+async function imprimerSynthese() {
+  // Fermer le dropdown
+  document.getElementById('dropdown-menu-gestion').classList.remove('show');
+
+  // Préparer les données pour l'impression (uniquement la promotion filtrée)
+  const elevesAImprimer = promotionSelectionnee
+    ? tousLesEleves.filter(e => (e.promotion || e.classe) === promotionSelectionnee)
+    : tousLesEleves;
+
+  const elevesPourImpression = [];
+
+  for (const eleve of elevesAImprimer) {
+    const notes = await chargerNotesEleve(eleve.id);
+    const moyenne = notes && notes.moyenne_generale !== null && notes.moyenne_generale !== undefined
+      ? notes.moyenne_generale.toFixed(2)
+      : 'Non évalué';
+
+    elevesPourImpression.push({
+      nom: eleve.nom,
+      prenom: eleve.prenom,
+      promotion: eleve.promotion || eleve.classe,
+      moyenne: moyenne
+    });
+  }
+
+  // Trier par nom
+  elevesPourImpression.sort((a, b) => {
+    if (a.nom < b.nom) return -1;
+    if (a.nom > b.nom) return 1;
+    return 0;
+  });
+
+  // Créer une fenêtre d'impression
+  const printWindow = window.open('', '_blank');
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Synthèse des évaluations E5</title>
+      <style>
+        @page {
+          size: portrait;
+          margin: 2cm;
+        }
+
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 20px;
+        }
+
+        h1 {
+          text-align: center;
+          color: #333;
+          margin-bottom: 10px;
+          font-size: 24px;
+        }
+
+        h2 {
+          text-align: center;
+          color: #666;
+          margin-bottom: 30px;
+          font-size: 16px;
+          font-weight: normal;
+        }
+
+        .info {
+          text-align: right;
+          margin-bottom: 20px;
+          font-size: 12px;
+          color: #666;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+        }
+
+        th {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 12px;
+          text-align: left;
+          font-weight: 600;
+          border: 1px solid #5568d3;
+        }
+
+        td {
+          padding: 10px 12px;
+          border: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+          background-color: #f8f9fa;
+        }
+
+        tr:hover {
+          background-color: #e9ecef;
+        }
+
+        .moyenne-cell {
+          text-align: center;
+          font-weight: 600;
+        }
+
+        .moyenne-complete {
+          color: #28a745;
+        }
+
+        .moyenne-incomplete {
+          color: #ffc107;
+        }
+
+        .footer {
+          margin-top: 30px;
+          text-align: center;
+          font-size: 10px;
+          color: #999;
+        }
+
+        @media print {
+          body {
+            padding: 0;
+          }
+
+          tr:hover {
+            background-color: transparent !important;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <h1>🎓 Synthèse des évaluations</h1>
+      <h2>BTS CIEL - Épreuve E5${promotionSelectionnee ? ' — Promotion ' + promotionSelectionnee : ''}</h2>
+
+      <div class="info">
+        Date d'impression : ${new Date().toLocaleDateString('fr-FR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })}
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>NOM</th>
+            <th>PRÉNOM</th>
+            <th>PROMOTION</th>
+            <th style="text-align: center;">MOYENNE E5</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${elevesPourImpression.map(eleve => `
+            <tr>
+              <td>${eleve.nom}</td>
+              <td>${eleve.prenom}</td>
+              <td>${eleve.promotion}</td>
+              <td class="moyenne-cell ${eleve.moyenne !== 'Non évalué' ? 'moyenne-complete' : 'moyenne-incomplete'}">
+                ${eleve.moyenne !== 'Non évalué' ? eleve.moyenne + '/20' : eleve.moyenne}
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+
+      <div class="footer">
+        <p>Document généré automatiquement - ${elevesPourImpression.length} élève(s)</p>
+      </div>
+
+      <script>
+        window.onload = function() {
+          window.print();
+          // Fermer la fenêtre après l'impression (optionnel)
+          // window.onafterprint = function() { window.close(); };
+        };
+      </script>
+    </body>
+    </html>
+  `;
+
+  printWindow.document.write(html);
+  printWindow.document.close();
 }

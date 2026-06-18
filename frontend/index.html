@@ -9,8 +9,13 @@
 <body>
   <div class="container">
     <header>
-      <h1>🎓 Évaluation BTS CIEL</h1>
-      <h2>Épreuve E5 : Exploitation et maintenance de réseaux informatiques</h2>
+      <div class="header-logo-container">
+        <img src="/images/logo.png" alt="Logo Académie de Versailles" class="header-logo">
+      </div>
+      <div class="header-text">
+        <h1>Évaluation BTS CIEL</h1>
+        <h2>Épreuve E5 : Exploitation et maintenance de réseaux informatiques</h2>
+      </div>
       <div class="user-info">
         <span id="username-display"></span>
         <button class="btn btn-secondary btn-sm" onclick="deconnexion()">Déconnexion</button>
@@ -21,13 +26,28 @@
       <div class="toolbar">
         <div>
           <button class="btn btn-success" onclick="ouvrirModalAjout()">➕ Ajouter un élève</button>
+          <button class="btn btn-primary" onclick="ouvrirModalImport()">📥 Importer un PDF</button>
+          <button class="btn btn-danger" id="btn-supprimer-selection" onclick="supprimerSelection()" disabled>
+            🗑️ Supprimer la sélection (<span id="count-selection">0</span>)
+          </button>
           <button class="btn btn-secondary" onclick="refreshEleves()">🔄 Actualiser</button>
-        </div>
-        <div class="filters">
-          <label for="filtre-promotion">Promotion :</label>
-          <select id="filtre-promotion" onchange="filtrerParPromotion()">
-            <option value="">Toutes les promotions</option>
-          </select>
+          <div class="dropdown" id="dropdown-gestion" style="display: inline-block;">
+            <button class="btn btn-secondary dropdown-toggle" onclick="toggleDropdownGestion(event)">
+              ⚙️ Gestion
+            </button>
+            <div class="dropdown-menu" id="dropdown-menu-gestion">
+              <button class="dropdown-item" onclick="ouvrirModalParametres()">
+                🏫 Établissement & Académie
+              </button>
+              <a href="/change-password.html" class="dropdown-item">
+                🔑 Changer le mot de passe
+              </a>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item" onclick="imprimerSynthese()">
+                🖨️ Imprimer synthèse
+              </button>
+            </div>
+          </div>
         </div>
         <div class="info">
           <span id="count-eleves">0 élève(s)</span>
@@ -40,12 +60,22 @@
       <table id="table-eleves" class="table-eleves" style="display: none;">
         <thead>
           <tr>
+            <th class="col-select"><input type="checkbox" id="check-all" onclick="toggleSelectAll(this)" title="Tout sélectionner"></th>
             <th>ID</th>
             <th>Nom</th>
             <th>Prénom</th>
-            <th>Promotion</th>
+            <th class="filterable-column">
+              <div class="column-header-wrapper">
+                <span>Promotion</span>
+                <div class="column-filter-dropdown" id="filter-promotion-dropdown">
+                  <select id="filter-promotion-select" class="filter-select">
+                    <option value="">Toutes les promotions</option>
+                    <!-- Rempli dynamiquement -->
+                  </select>
+                </div>
+              </div>
+            </th>
             <th>Moyenne</th>
-            <th>N° Candidat</th>
             <th>Statut Excel</th>
             <th>Actions</th>
           </tr>
@@ -59,6 +89,32 @@
     <footer>
       <p>Application d'évaluation - Session 2024</p>
     </footer>
+  </div>
+
+  <!-- Modal pour les paramètres -->
+  <div id="modal-parametres" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Paramètres de l'établissement</h2>
+        <button class="btn-close" onclick="fermerModalParametres()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-parametres" onsubmit="sauvegarderParametres(event)">
+          <div class="form-group">
+            <label for="param-academie">Académie *</label>
+            <input type="text" id="param-academie" name="academie" required>
+          </div>
+          <div class="form-group">
+            <label for="param-etablissement">Établissement *</label>
+            <input type="text" id="param-etablissement" name="etablissement" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="fermerModalParametres()">Annuler</button>
+            <button type="submit" class="btn btn-success">Sauvegarder</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
   <!-- Modal pour ajouter un élève -->
@@ -101,6 +157,47 @@
           <div class="modal-actions">
             <button type="button" class="btn btn-secondary" onclick="fermerModalAjout()">Annuler</button>
             <button type="submit" class="btn btn-success">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour importer des élèves depuis un PDF -->
+  <div id="modal-import-pdf" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Importer une liste d'élèves (PDF)</h2>
+        <button class="btn-close" onclick="fermerModalImport()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-import-pdf" onsubmit="importerPdf(event)">
+          <div class="form-group">
+            <label for="import-fichier">Fichier PDF (export Index Education / Pronote) *</label>
+            <input type="file" id="import-fichier" name="fichier" accept="application/pdf,.pdf" required>
+          </div>
+          <div class="form-group">
+            <label for="import-promotion">Promotion *</label>
+            <input type="text" id="import-promotion" name="promotion" value="2024-2026"
+                   pattern="\d{4}-\d{4}" title="Format : AAAA-AAAA (ex: 2024-2026)" required>
+          </div>
+          <div class="form-group">
+            <label for="import-academie">Académie *</label>
+            <input type="text" id="import-academie" name="academie" value="Académie de Versailles" required>
+          </div>
+          <div class="form-group">
+            <label for="import-etablissement">Établissement *</label>
+            <input type="text" id="import-etablissement" name="etablissement" value="Lycée Isaac Newton" required>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="import-replace" name="replace">
+              Remplacer toute la liste existante (sinon : fusion, sans doublons)
+            </label>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="fermerModalImport()">Annuler</button>
+            <button type="submit" class="btn btn-success" id="import-submit">Importer</button>
           </div>
         </form>
       </div>

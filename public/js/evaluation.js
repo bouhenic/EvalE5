@@ -1,6 +1,47 @@
 // Configuration API dynamique (adapte automatiquement HTTP ou HTTPS)
 const API_BASE = `${window.location.protocol}//${window.location.host}/api`;
 
+// Échappe les caractères HTML (les retours à la ligne sont conservés,
+// rendus via CSS white-space: pre-line dans la bulle d'aide).
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+// Positionne la bulle d'aide (position: fixed) sous l'icône, ou au-dessus
+// s'il manque de place en bas. Recalé dans le viewport horizontalement.
+function positionnerBulleAide(icone) {
+  const bulle = icone.querySelector('.aide-bulle');
+  if (!bulle) return;
+  const marge = 8;
+  const r = icone.getBoundingClientRect();
+  const bw = bulle.offsetWidth;   // dimensions dispo même en visibility:hidden
+  const bh = bulle.offsetHeight;
+
+  let left = Math.min(r.left, window.innerWidth - bw - marge);
+  if (left < marge) left = marge;
+
+  let top = r.bottom + 6;
+  if (top + bh > window.innerHeight - marge) {
+    top = r.top - bh - 6;                       // bascule au-dessus
+    if (top < marge) top = marge;
+  }
+  bulle.style.left = left + 'px';
+  bulle.style.top = top + 'px';
+}
+
+// Calcule la position juste avant l'affichage (survol souris ou focus clavier).
+document.addEventListener('mouseover', (e) => {
+  const icone = e.target.closest && e.target.closest('.aide-critere');
+  if (icone) positionnerBulleAide(icone);
+});
+document.addEventListener('focusin', (e) => {
+  const icone = e.target.closest && e.target.closest('.aide-critere');
+  if (icone) positionnerBulleAide(icone);
+});
+
 // Variables globales
 let eleveId = null;
 let eleveData = null;
@@ -194,8 +235,13 @@ async function genererFormulaire() {
       // Badge pour indiquer si non évalué
       const badgeNonEvalue = nonEvalue ? '<span class="badge badge-warning-small">Non évalué</span>' : '';
 
+      // Encadré d'aide au positionnement (au survol), repris de la grille officielle
+      const aideHtml = critere.aide
+        ? `<span class="aide-critere" tabindex="0" aria-label="Aide au positionnement">ℹ️<span class="aide-bulle">${escapeHtml(critere.aide)}</span></span>`
+        : '';
+
       tr.innerHTML = `
-        <td class="critere-nom">${critere.nom} ${badgeNonEvalue}</td>
+        <td class="critere-nom">${critere.nom} ${aideHtml} ${badgeNonEvalue}</td>
         <td class="critere-coef">${critere.coefficient}</td>
         <td class="niveau-cell">
           <input type="radio" name="${critere.id}" value="0"
