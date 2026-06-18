@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const dataService = require('../services/dataService');
 const excelService = require('../services/excelService');
+const pdfImport = require('../services/pdfImportService');
 
 /**
  * GET /api/eleves
@@ -11,13 +12,14 @@ router.get('/eleves', async (req, res) => {
   try {
     const eleves = await dataService.getEleves();
 
-    // Ajouter l'info si le fichier Excel existe
-    const elevesAvecFichier = await Promise.all(
-      eleves.map(async (eleve) => {
-        const fichierExiste = await excelService.fichierExiste(eleve.nom, eleve.prenom, eleve);
-        return { ...eleve, fichierExiste };
-      })
-    );
+    // Initialiser le cache si nécessaire (première requête uniquement)
+    await excelService.initialiserCache(eleves);
+
+    // Ajouter l'info si le fichier Excel existe (utilise le cache)
+    const elevesAvecFichier = eleves.map((eleve) => {
+      const fichierExiste = excelService.fichierExisteCache.get(eleve.id) || false;
+      return { ...eleve, fichierExiste };
+    });
 
     res.json(elevesAvecFichier);
   } catch (error) {
@@ -191,7 +193,65 @@ router.get('/eleves/:id/telecharger', async (req, res) => {
 router.post('/eleves', async (req, res) => {
   try {
     const result = await dataService.addEleve(req.body);
+    excelService.resetCache();
     res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/eleves/import-pdf
+ * Importe des élèves depuis un PDF "Liste des élèves par classe" (Index Education).
+ * Corps JSON : { pdfBase64, promotion, academie?, etablissement?, replace? }
+ */
+router.post('/eleves/import-pdf', async (req, res) => {
+  try {
+    const { pdfBase64, promotion, academie, etablissement, replace } = req.body;
+
+    if (!pdfBase64) {
+      return res.status(400).json({ error: 'Aucun fichier PDF fourni' });
+    }
+    if (!promotion || !/^\d{4}-\d{4}$/.test(promotion)) {
+      return res.status(400).json({ error: 'Promotion invalide (format attendu : AAAA-AAAA)' });
+    }
+
+    // Le front envoie une data-URL "data:application/pdf;base64,XXXX"
+    const base64 = pdfBase64.replace(/^data:.*;base64,/, '');
+    const buffer = Buffer.from(base64, 'base64');
+
+    const parsed = pdfImport.extractNamesFromBuffer(buffer);
+    if (parsed.length === 0) {
+      return res.status(422).json({ error: 'Aucun élève détecté dans le PDF' });
+    }
+
+    const existants = replace ? [] : await dataService.getEleves();
+    const { ajoutes, ignores } = pdfImport.buildEleveRecords(parsed, existants, {
+      promotion,
+      academie,
+      etablissement,
+    });
+
+    // En mode remplacement, les évaluations des anciens élèves sont écartées.
+    const evaluations = replace ? {} : await dataService.getEvaluations();
+    const renum = dataService.renumeroterTout([...existants, ...ajoutes], evaluations);
+    await dataService.sauvegarderElevesEtEvaluations(renum.eleves, renum.evaluations);
+    excelService.resetCache();
+
+    // Récupère les élèves réellement ajoutés avec leur id/numero définitifs.
+    const cle = (e) => `${e.nom}|${e.prenom}`.toLowerCase();
+    const ajouteSet = new Set(ajoutes.map(cle));
+    const ajoutesFinal = renum.eleves
+      .filter((e) => ajouteSet.has(cle(e)))
+      .sort((a, b) => a.id - b.id);
+
+    res.json({
+      success: true,
+      message: `${ajoutes.length} élève(s) importé(s)`,
+      lus: parsed.length,
+      ajoutes: ajoutesFinal,
+      ignores,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -204,6 +264,25 @@ router.post('/eleves', async (req, res) => {
 router.put('/eleves/:id', async (req, res) => {
   try {
     const result = await dataService.updateEleve(req.params.id, req.body);
+    excelService.resetCache();
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/eleves/supprimer-multiple
+ * Supprime plusieurs élèves d'un coup. Corps JSON : { ids: [1, 2, ...] }
+ */
+router.post('/eleves/supprimer-multiple', async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: 'Aucun élève sélectionné' });
+    }
+    const result = await dataService.deleteEleves(ids);
+    excelService.resetCache();
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -217,6 +296,7 @@ router.put('/eleves/:id', async (req, res) => {
 router.delete('/eleves/:id', async (req, res) => {
   try {
     const result = await dataService.deleteEleve(req.params.id);
+    excelService.resetCache();
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -231,6 +311,19 @@ router.get('/eleves/:id/notes', async (req, res) => {
   try {
     const notes = await dataService.calculerNotes(req.params.id);
     res.json(notes);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/cache/reset
+ * Réinitialise le cache des fichiers Excel
+ */
+router.post('/cache/reset', async (req, res) => {
+  try {
+    excelService.resetCache();
+    res.json({ success: true, message: 'Cache réinitialisé avec succès' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

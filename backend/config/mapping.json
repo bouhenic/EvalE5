@@ -7,7 +7,6 @@
     "recapitulatif": "E5-FICHE RECAPITULATIVE E5-IR",
     "jury": "FICHE RENDU JURY E5 - ER"
   },
-
   "identite": {
     "academie": {
       "semestre_1": "E7",
@@ -58,7 +57,6 @@
       "jury": "B18"
     }
   },
-
   "competences": {
     "C02": {
       "nom": "ORGANISER UNE INTERVENTION",
@@ -68,19 +66,22 @@
           "id": "c02_c1",
           "nom": "Les différents interlocuteurs et ressources sont identifiés",
           "coefficient": 0.25,
-          "ligne": 20
+          "ligne": 20,
+          "aide": "Aide au positionnement du niveau :\n\nLe rôle des différents interlocuteurs est connu.\n\nLa liste des équipements/logiciels à prévoir est exhaustive.\n\nLes impacts des exigences sur les autres systèmes sont identifiés.\n\nLes tâches professionnelles à exécuter sont identifiées."
         },
         {
           "id": "c02_c2",
           "nom": "Le cahier des charges préliminaire est complété et les ressources permettant de répondre au cahier des charges sont décrites",
           "coefficient": 0.25,
-          "ligne": 21
+          "ligne": 21,
+          "aide": "Aide au positionnement du niveau :\n\nLes fonctions principales du cahier des charges peuvent être complétées par des fiches d'intervention.\n\nChaque fiche d'intervention contient la liste des étapes de l'intervention et les ressources nécessaires.\n\nChaque fiche d'intervention est détaillée avec un plan d'adressage et des diagrammes (réseaux, SYSML ...)\n\nLa continuité de service est prise en compte."
         },
         {
           "id": "c02_c3",
           "nom": "Le planning prévisionnel est interprété",
           "coefficient": 0.2,
-          "ligne": 22
+          "ligne": 22,
+          "aide": "Aide au positionnement du niveau :\n\nUn outil de répartition des tâches est utilisé (Gantt, Kanban …) \n\nLes intervenants et leurs rôles sont identifiés.\n\nLes dépendances entre les tâches sont identifiées.\n\nLe chemin critique est identifié et quantifié."
         },
         {
           "id": "c02_c4",
@@ -98,31 +99,36 @@
           "id": "c06_c1",
           "nom": "Les exigences à valider sont identifiées dans le périmètre défini",
           "coefficient": 0.2,
-          "ligne": 31
+          "ligne": 31,
+          "aide": "Aide au positionnement du niveau :\n\nLe périmètre d'intervention est identifié en utilisant un diagramme réseau et/ou SYSML.\n\nLes interactions et les caractéristiques des communications avec les autres systèmes sont identifiées. \n\nLes outils de diagnostic sont identifiés.\n\nLes paramétrages existants sont identifiés."
         },
         {
           "id": "c06_c2",
           "nom": "Les procédures de test sont établies",
           "coefficient": 0.2,
-          "ligne": 32
+          "ligne": 32,
+          "aide": "Aide au positionnement du niveau :\n\nUn document listant les exigences et les tests associés peut être rédigé sous forme d'un cahier de recette. \n\nLe document est organisé en suivant une démarche logique.  \n\nLe document est exhaustif, chaque test est associé à une exigence. \n\nUne automatisation des tests est proposée."
         },
         {
           "id": "c06_c3",
           "nom": "Les tests (unitaires, d'intégration et autres) sont appliqués",
           "coefficient": 0.1,
-          "ligne": 33
+          "ligne": 33,
+          "aide": "Aide au positionnement du niveau :\n\nLes tests sont réalisés conformément aux procédures avec les appareils ou logiciels adéquats.\n\nLes outils de diagnostic sont correctement utilisés.\n\nLe résultat de chaque test et son incertitude, est correctement appréhendé. \n\nLe cahier de recette peut être complété avec les résultats obtenus."
         },
         {
           "id": "c06_c4",
           "nom": "Les résultats de tests sont synthétisés pour évaluer la conformité globale",
           "coefficient": 0.1,
-          "ligne": 34
+          "ligne": 34,
+          "aide": "Aide au positionnement du niveau :\n\nLes résultats des tests et leurs incertitudes sont correctement interprétés.\n\nLes anomalies sont identifiées, le PV d’anomalie est rédigé.\n\nUn diagnostic des anomalies est posé, la documentation relative à l’installation est éventuellement mise à jour.\n\nUn bilan au regard des exigences est établi."
         },
         {
           "id": "c06_c5",
           "nom": "Le document de recette est validé par le client et la recette est réalisée avec le client",
           "coefficient": 0.1,
-          "ligne": 35
+          "ligne": 35,
+          "aide": "Aide au positionnement du niveau :\n\nLes étapes de recette sont énoncées clairement au client.\n\nLe vocabulaire utilisé est adapté au client. Le discours est clair et structuré.\n\nLe cahier de recette (PV de livraison) est rempli et validé avec le client.\n\nLe client pourra être conseillé sur les futures actions de maintenance du système et les points de vigilance de la cybersécurité."
         },
         {
           "id": "c06_c6",
@@ -140,31 +146,36 @@
           "id": "c09_c1",
           "nom": "Les équipements nécessaires à la réponse au CDC (fourni par le client) sont identifiés",
           "coefficient": 0.2,
-          "ligne": 44
+          "ligne": 44,
+          "aide": "Aide au positionnement du niveau :\n\nLes différents éléments matériels du réseau sont identifiés\n\nLe rôle des différents éléments est explicité.     \n\nUn schéma réseau les présente  \n\nLes protocoles réseaux et de communication répondant au CDC sont choisis et explicités."
         },
         {
           "id": "c09_c2",
           "nom": "Une procédure de configuration ou d'installation est déterminée ainsi que les points critiques",
           "coefficient": 0.2,
-          "ligne": 45
+          "ligne": 45,
+          "aide": "Aide au positionnement du niveau :\n\nLes étapes de configuration ou d’installation sont détaillées.\n\nLes paramètres de configuration choisis sont cohérents.\n\nUn plan d'adressage cohérent est rédigé ou complété.\n\nLes enjeux de la cybersécurité sont pris en compte."
         },
         {
           "id": "c09_c3",
           "nom": "La ou les procédures choisies sont suivies",
           "coefficient": 0.1,
-          "ligne": 46
+          "ligne": 46,
+          "aide": "Aide au positionnement du niveau :\n\nLa procédure est exécutée, un compte-rendu de l’avancement est effectué.\n\nLes fichiers de configuration sont sauvegardés.\n\nSi la procédure contient des oublis, ils sont identifiés.\n\nSi la procédure échoue, un correctif est proposé."
         },
         {
           "id": "c09_c4",
           "nom": "Les activités sont menées en respectant les règles de sécurité",
           "coefficient": 0.1,
-          "ligne": 47
+          "ligne": 47,
+          "aide": "Aide au positionnement du niveau :\n\nLes niveaux d'habilitation (cybersécurité, électrique, secret ... )  sont identifiés et respectés.\n\nLes politiques de sécurité (des personnes, des données, des réseaux) sont suivies. \n\nLes mises à jour de sécurité, les scripts de mise à jour automatique sont déployés.\n\nLes documents sont protégés, les accès systèmes sont surveillés et protégés."
         },
         {
           "id": "c09_c5",
           "nom": "Un compte-rendu du fonctionnement de l'installation est fourni",
           "coefficient": 0.1,
-          "ligne": 48
+          "ligne": 48,
+          "aide": "Aide au positionnement du niveau :\n\nUn compte-rendu est rédigé, avec la procédure de configuration complétée.\n\nLe compte rendu des configurations recense les sauvegardes des fichiers de configuration des équipements. \n\nDes schémas de repérage de l'installation sont créés ou complétés.\n\nUn reporting régulier (avancement, points d’étapes, alertes) au client, à la hiérarchie, aux prestataires est effectué."
         },
         {
           "id": "c09_c6",
@@ -182,25 +193,29 @@
           "id": "c11_c1",
           "nom": "Les outils logiciels et matériels permettant d'effectuer les tests et l'analyse du SI sont identifiés et mis en œuvre",
           "coefficient": 0.2,
-          "ligne": 57
+          "ligne": 57,
+          "aide": "Aide au positionnement du niveau :\n\nLes outils logiciels et matériels de test sont identifiés.\n\nLes tests sont réalisés dans un ordre logique.\n\nLes tests sont réalisés sans oublis.\n\nLe rapport d’incident est complété avec les résultats."
         },
         {
           "id": "c11_c2",
           "nom": "Les résultats de tests et d'analyse sont interprétés de manière pertinente et les causes de l'incident sont localisées",
           "coefficient": 0.2,
-          "ligne": 58
+          "ligne": 58,
+          "aide": "Aide au positionnement du niveau :\n\nLa correspondance outils utilisés / diagnostiques est présentée.\n\nLes résultats des tests sont correctement lus, le niveau de criticité est établi.\n\nLes causes sont localisées, la durée du diagnostic est optimale.\n\nLes procédures de traitement de l’incident sont choisies et réalisées."
         },
         {
           "id": "c11_c3",
           "nom": "L'incident est résolu ou qualifié et escaladé, le service est opérationnel",
           "coefficient": 0.2,
-          "ligne": 59
+          "ligne": 59,
+          "aide": "Aide au positionnement du niveau :\n\nLa remise en service est effective, les vérifications de l'état du système sont effectuées.  \n\nUne fiche de clôture d'incident est complétée.\n\nSi l'incident demande l'intervention d'un expert, les tests et les causes probables sont succinctement expliqués dans une fiche de suivi d'incident.  Si l'incident incombe au technicien, les actions à mener sont identifiées et réalisées. \n\nUne fiche pour la base de connaissance de l'entreprise peut être proposée."
         },
         {
           "id": "c11_c4",
           "nom": "Le client est correctement informé et conseillé quant aux mesures de prévention possibles",
           "coefficient": 0.1,
-          "ligne": 60
+          "ligne": 60,
+          "aide": "Aide au positionnement du niveau :\n\nLe client est informé des causes de l'incident.\n\nLe client est informé des mesures de prévention à suivre.\n\nLe client est informé des actions à mener pour éviter la reproduction de l'incident. \n\nDes outils de surveillances, des scripts d’alertes sont proposés."
         },
         {
           "id": "c11_c5",
@@ -211,7 +226,6 @@
       ]
     }
   },
-
   "niveaux": {
     "niveau_1": {
       "colonne": "C",
@@ -234,7 +248,6 @@
       "label": "Réalisation très satisfaisante"
     }
   },
-
   "commentaires": {
     "commentaire_global": {
       "semestre_1": "A7",

@@ -9,6 +9,81 @@ class ExcelService {
   constructor() {
     this.modelePath = path.join(process.cwd(), config.paths.modeles, config.fichiers.modele_excel);
     this.exportPath = path.join(process.cwd(), config.paths.export);
+
+    // Cache pour éviter les lectures répétées
+    this.modeleCache = null;
+    this.fichierExisteCache = new Map(); // eleveId -> boolean
+    this.cacheInitialise = false;
+  }
+
+  /**
+   * Charge le modèle Excel en cache (une seule fois)
+   * @returns {Promise<XlsxPopulate.Workbook>} - Modèle Excel en mémoire
+   */
+  async chargerModele() {
+    if (!this.modeleCache) {
+      console.log('📂 Chargement du modèle Excel en cache...');
+      this.modeleCache = await XlsxPopulate.fromFileAsync(this.modelePath);
+      console.log('✅ Modèle Excel chargé en cache');
+    }
+    // Cloner le modèle pour éviter les modifications du cache
+    return this.modeleCache;
+  }
+
+  /**
+   * Initialise le cache des fichiers existants
+   * @param {Array} eleves - Liste des élèves
+   */
+  async initialiserCache(eleves) {
+    if (this.cacheInitialise) return;
+
+    console.log('🔄 Initialisation du cache des fichiers Excel...');
+    this.fichierExisteCache.clear();
+
+    // Vérifier l'existence des fichiers en parallèle
+    await Promise.all(
+      eleves.map(async (eleve) => {
+        const existe = await this.verifierFichierExiste(eleve);
+        this.fichierExisteCache.set(eleve.id, existe);
+      })
+    );
+
+    this.cacheInitialise = true;
+    console.log(`✅ Cache initialisé pour ${eleves.length} élèves`);
+  }
+
+  /**
+   * Vérifie physiquement si un fichier existe sur le disque
+   * @param {Object} eleve
+   * @returns {Promise<boolean>}
+   */
+  async verifierFichierExiste(eleve) {
+    const fileName = `${eleve.nom}_${eleve.prenom}_E5_Evaluation.xlsx`;
+    const promotionPath = this.getPromotionPath(eleve);
+    const filePath = path.join(promotionPath, fileName);
+
+    try {
+      await fs.access(filePath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Invalide le cache pour un élève spécifique
+   * @param {number} eleveId
+   */
+  invaliderCache(eleveId) {
+    this.fichierExisteCache.delete(eleveId);
+  }
+
+  /**
+   * Réinitialise complètement le cache
+   */
+  resetCache() {
+    this.fichierExisteCache.clear();
+    this.cacheInitialise = false;
   }
 
   /**
@@ -36,7 +111,7 @@ class ExcelService {
       const outputFileName = `${eleve.nom}_${eleve.prenom}_E5_Evaluation.xlsx`;
       const outputPath = path.join(promotionPath, outputFileName);
 
-      // Charger le modèle avec xlsx-populate
+      // Charger une copie fraîche du modèle (xlsx-populate n'a pas de clone()).
       const workbook = await XlsxPopulate.fromFileAsync(this.modelePath);
 
       // Remplir les informations d'identité dans tous les onglets
@@ -44,6 +119,9 @@ class ExcelService {
 
       // Sauvegarder le fichier
       await workbook.toFileAsync(outputPath);
+
+      // Mettre à jour le cache : le fichier existe maintenant
+      this.fichierExisteCache.set(eleve.id, true);
 
       return outputFileName;
     } catch (error) {
@@ -144,8 +222,8 @@ class ExcelService {
         throw new Error(`Feuille non trouvée: ${sheetName}`);
       }
 
-      // Effacer d'abord tous les "x" existants dans cette feuille
-      this.effacerEvaluations(sheet);
+      // Effacer seulement les "x" des critères qui vont être mis à jour
+      this.effacerEvaluationsOptimise(sheet, evaluationData);
 
       // Remplir les évaluations pour chaque compétence
       if (evaluationData.competences) {
@@ -238,22 +316,59 @@ class ExcelService {
   }
 
   /**
-   * Vérifie si le fichier Excel d'un élève existe
+   * Efface uniquement les évaluations des critères concernés (optimisé)
+   * @param {XlsxPopulate.Sheet} sheet
+   * @param {Object} evaluationData - Données d'évaluation
+   */
+  effacerEvaluationsOptimise(sheet, evaluationData) {
+    const colonnes = ['C', 'D', 'E', 'F'];
+
+    // Parcourir uniquement les compétences présentes dans les données
+    if (!evaluationData.competences) return;
+
+    for (const [compCode, compData] of Object.entries(evaluationData.competences)) {
+      const competence = mapping.competences[compCode];
+      if (!competence || !compData.criteres) continue;
+
+      // Parcourir uniquement les critères modifiés
+      for (const critereId of Object.keys(compData.criteres)) {
+        const critere = competence.criteres.find(c => c.id === critereId);
+        if (!critere) continue;
+
+        // Effacer toutes les colonnes de ce critère
+        for (const col of colonnes) {
+          const cellAddress = `${col}${critere.ligne}`;
+          try {
+            const cell = sheet.cell(cellAddress);
+            const value = cell.value();
+            // Ne supprimer que si c'est un "x"
+            if (value === 'x' || value === 'X') {
+              cell.value(null);
+            }
+          } catch (err) {
+            // Ignorer les erreurs de cellule inexistante
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Vérifie si le fichier Excel d'un élève existe (utilise le cache)
    * @param {string} nom
    * @param {string} prenom
    * @param {Object} eleve - Objet élève complet avec promotion
    */
   async fichierExiste(nom, prenom, eleve) {
-    const fileName = `${nom}_${prenom}_E5_Evaluation.xlsx`;
-    const promotionPath = this.getPromotionPath(eleve);
-    const filePath = path.join(promotionPath, fileName);
-
-    try {
-      await fs.access(filePath);
-      return true;
-    } catch {
-      return false;
+    // Vérifier d'abord dans le cache
+    if (this.fichierExisteCache.has(eleve.id)) {
+      return this.fichierExisteCache.get(eleve.id);
     }
+
+    // Si pas en cache, vérifier physiquement
+    const existe = await this.verifierFichierExiste(eleve);
+    this.fichierExisteCache.set(eleve.id, existe);
+    return existe;
   }
 
   /**

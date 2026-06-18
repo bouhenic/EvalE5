@@ -42,8 +42,9 @@ try {
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Limite relevée pour accepter les PDF encodés en base64 (import d'élèves).
+app.use(bodyParser.json({ limit: '25mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '25mb' }));
 
 // Configuration des sessions
 app.use(session({
@@ -66,6 +67,16 @@ app.get('/login.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/login.html'));
 });
 
+// Migration des ids vers le format 2026XX (idempotente, au démarrage)
+const dataService = require('./services/dataService');
+dataService.migrerIds()
+  .then(({ change, total }) => {
+    if (change) {
+      console.log(`🔢 Migration des ids effectuée (${total} élèves renumérotés au format 2026XX)`);
+    }
+  })
+  .catch((err) => console.error('⚠️  Migration des ids échouée:', err.message));
+
 // Middleware d'authentification pour les routes protégées
 const { requireAuth } = require('./middleware/auth');
 
@@ -85,6 +96,11 @@ app.get('/', requireAuth, (req, res) => {
 // Route pour la page d'évaluation - protégée
 app.get('/evaluation/:id', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/evaluation.html'));
+});
+
+// Route pour la page de changement de mot de passe - protégée
+app.get('/change-password.html', requireAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/change-password.html'));
 });
 
 // Gestion des erreurs 404
